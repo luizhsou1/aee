@@ -2,10 +2,6 @@
   "name": "api-aee",
   "version": "0.0.1",
   "description": "AEE project REST API",
-  "main": "index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luizhsou1/aee.git"
@@ -15,5 +11,8 @@
   "bugs": {
     "url": "https://github.com/luizhsou1/aee/issues"
   },
-  "homepage": "https://github.com/luizhsou1/aee#readme"
+  "homepage": "https://github.com/luizhsou1/aee#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
