@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  pg_aee:
+    container_name: pg_aee
+    image: postgres:13.5-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    env_file:
+      - .env
+    volumes:
+      - ./.docker/postgres:/var/lib/postgresql/data
+    ports:
+      - ${DB_PORT}:5432
+    tty: true
+    networks:
+      - network
+    healthcheck:
+      test: [
+        "CMD",
+        "pg_isready",
+        "-U",
+        "${DB_USER}",
+      ]
+      interval: 3s
+      timeout: 5s
+      retries: 15
+    restart: on-failure
+
+networks:
+  network:
+    driver: bridge
