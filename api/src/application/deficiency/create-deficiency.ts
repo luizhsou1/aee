@@ -1,10 +1,15 @@
+import { inject, singleton } from 'tsyringe'
+
 import { Deficiency, IDeficiencyRepo } from '../../domain'
-import { TypeormDeficiencyRepo } from '../../infra/db/repositories'
 import { getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
 
-class CreateDeficiency implements IApplicationService {
-  constructor (private readonly deficiencyRepo: IDeficiencyRepo) {}
+@singleton()
+export class CreateDeficiency implements IApplicationService {
+  constructor (
+    @inject('IDeficiencyRepo')
+    private readonly deficiencyRepo: IDeficiencyRepo
+  ) {}
 
   /**
   * @throws ValidationError
@@ -16,7 +21,3 @@ class CreateDeficiency implements IApplicationService {
     return this.deficiencyRepo.save(deficiency)
   }
 }
-
-const createDeficiency = new CreateDeficiency(new TypeormDeficiencyRepo())
-
-export { createDeficiency }

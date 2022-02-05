@@ -8,7 +8,7 @@ interface IValidateOptions {
 }
 
 export class Entity {
-  @Expose() private id?: number
+  @Expose() id?: number
   @Expose() private createdAt?: Date
   @Expose() private updatedAt?: Date
 

@@ -1,6 +1,10 @@
 import { Deficiency } from '.'
 import { Paginated, IPaginationOptions } from '../common'
 
+export interface IDeficiencyQueryOptions {
+  name?: string
+}
+
 export interface IDeficiencyRepo {
   /**
    * Checks if there is a deficiency in repository
@@ -13,7 +17,7 @@ export interface IDeficiencyRepo {
   /**
    * Find Deficiency by id
    */
-  find(options?: IPaginationOptions): Promise<Paginated<Deficiency>>
+  find(options?: IPaginationOptions & IDeficiencyQueryOptions): Promise<Paginated<Deficiency>>
   /**
    * Find Deficiency by id
    */

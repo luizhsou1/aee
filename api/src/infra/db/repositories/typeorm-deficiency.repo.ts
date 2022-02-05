@@ -1,6 +1,6 @@
-import { getRepository } from 'typeorm'
+import { FindConditions, getRepository, Raw } from 'typeorm'
 
-import { Deficiency, IDeficiencyRepo } from '../../../domain'
+import { Deficiency, IDeficiencyQueryOptions, IDeficiencyRepo } from '../../../domain'
 import { IPaginationOptions, Paginated } from '../../../domain/common'
 import { getInstanceOf, getInstancesOf } from '../../../shared/utils'
 import { TypeormDeficiency } from '../entities'
@@ -34,14 +34,23 @@ export class TypeormDeficiencyRepo implements IDeficiencyRepo {
     page = 1,
     limit = 10,
     order = {
-      name: 'ASC'
+      name: 'ASC',
+      createdAt: 'ASC'
+    },
+    name = ''
+  } : IPaginationOptions & IDeficiencyQueryOptions = {}): Promise<Paginated<Deficiency>> {
+    const where: FindConditions<TypeormDeficiency> = {}
+    if (name) {
+      where.name = Raw((alias) => `unaccent(${alias}) ILIKE unaccent('%${name}%')`)
     }
-  } : IPaginationOptions = {}): Promise<Paginated<Deficiency>> {
+
     const [data, total] = await this.repo.findAndCount({
+      where,
       skip: (page - 1) * limit,
       take: limit,
       order
     })
+
     return new Paginated<Deficiency>(getInstancesOf(Deficiency, data), total, page, limit)
   }
 }

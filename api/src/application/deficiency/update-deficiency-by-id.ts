@@ -1,19 +1,24 @@
+import { inject, singleton } from 'tsyringe'
+
 import { Deficiency, DeficiencyNotFound, IDeficiencyRepo } from '../../domain'
 import { isIdOrFail } from '../../domain/validations'
-import { TypeormDeficiencyRepo } from '../../infra/db/repositories'
 import { getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
 
-class UpdateDeficiencyById implements IApplicationService {
-  constructor (private readonly deficiencyRepo: IDeficiencyRepo) {}
+@singleton()
+export class UpdateDeficiencyById implements IApplicationService {
+  constructor (
+    @inject('IDeficiencyRepo')
+    private readonly deficiencyRepo: IDeficiencyRepo
+  ) {}
 
   /**
   * @throws DeficiencyNotFound
   */
-  async execute (id: number | string, data: object): Promise<Deficiency> {
+  async execute (id: number, data: object): Promise<Deficiency> {
     isIdOrFail(id)
 
-    const exists = await this.deficiencyRepo.exists(Number(id))
+    const exists = await this.deficiencyRepo.exists(id)
     if (!exists) {
       throw new DeficiencyNotFound()
     }
@@ -24,7 +29,3 @@ class UpdateDeficiencyById implements IApplicationService {
     return this.deficiencyRepo.save(deficiency)
   }
 }
-
-const updateDeficiencyById = new UpdateDeficiencyById(new TypeormDeficiencyRepo())
-
-export { updateDeficiencyById }

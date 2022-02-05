@@ -1,12 +1,13 @@
 import { Router } from 'express'
+import { container } from 'tsyringe'
 
 import {
-  createDeficiency,
-  updateDeficiencyById,
-  deleteDeficiencyById,
-  getDeficiencyById,
-  getDeficiencies
+  CreateDeficiency,
+  DeleteDeficiencyById,
+  GetDeficiencyById,
+  UpdateDeficiencyById
 } from '../../../application/deficiency'
+import { IDeficiencyRepo } from '../../../domain'
 import { pagination } from '../middleware'
 
 export const deficienciesRoutes = Router()
@@ -79,7 +80,8 @@ export const deficienciesRoutes = Router()
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.post('/', async (req, res, next) => createDeficiency.execute(req.body)
+deficienciesRoutes.post('/', async (req, res, next) => container.resolve(CreateDeficiency)
+  .execute(req.body)
   .then((deficiency) => res.status(201).json(deficiency))
   .catch(next))
 
@@ -128,7 +130,9 @@ deficienciesRoutes.post('/', async (req, res, next) => createDeficiency.execute(
 */
 deficienciesRoutes.get('/', pagination, (req, res, next) => {
   const { page, limit, order } = res.locals
-  return getDeficiencies.execute({ page, limit, order })
+  const { name } = req.query as { [key: string]: string }
+  return container.resolve<IDeficiencyRepo>('IDeficiencyRepo')
+    .find({ page, limit, order, name })
     .then((paginatedDeficiency) => res.status(200).json(paginatedDeficiency))
     .catch(next)
 })
@@ -153,7 +157,8 @@ deficienciesRoutes.get('/', pagination, (req, res, next) => {
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.get('/:id', (req, res, next) => getDeficiencyById.execute(req.params.id)
+deficienciesRoutes.get('/:id', (req, res, next) => container.resolve(GetDeficiencyById)
+  .execute(Number(req.params.id))
   .then((deficiency) => res.status(200).json(deficiency))
   .catch(next))
 
@@ -186,7 +191,8 @@ deficienciesRoutes.get('/:id', (req, res, next) => getDeficiencyById.execute(req
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.patch('/:id', async (req, res, next) => updateDeficiencyById.execute(req.params.id, req.body)
+deficienciesRoutes.patch('/:id', async (req, res, next) => container.resolve(UpdateDeficiencyById)
+  .execute(Number(req.params.id), req.body)
   .then((deficiency) => res.status(200).json(deficiency))
   .catch(next))
 
@@ -207,6 +213,7 @@ deficienciesRoutes.patch('/:id', async (req, res, next) => updateDeficiencyById.
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.delete('/:id', (req, res, next) => deleteDeficiencyById.execute(req.params.id)
+deficienciesRoutes.delete('/:id', (req, res, next) => container.resolve(DeleteDeficiencyById)
+  .execute(Number(req.params.id))
   .then(() => res.status(204).send())
   .catch(next))
