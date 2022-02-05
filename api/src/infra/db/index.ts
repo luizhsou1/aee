@@ -1,10 +1,18 @@
-import { Connection, createConnection } from 'typeorm'
+import path from 'path'
+import { Connection, ConnectionOptions, createConnection } from 'typeorm'
+
+const options: ConnectionOptions = require('../../../ormconfig')
 
 export let connection: Connection
 
 export async function connectToDatabase (): Promise<void> {
   try {
-    connection = await createConnection()
+    connection = await createConnection({
+      ...options,
+      entities: [path.join(__dirname, 'entities', '*.{ts,js}')],
+      migrations: [path.join(__dirname, 'migrations', '**', '*..{ts,js}')],
+      subscribers: [path.join(__dirname, 'subscriber', '**', '*.{ts,js}')]
+    })
 
     if (!connection.isConnected) {
       console.warn('Failed to connect to the database')

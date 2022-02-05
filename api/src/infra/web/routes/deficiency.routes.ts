@@ -1,12 +1,21 @@
 import { Router } from 'express'
 
+import {
+  createDeficiency,
+  updateDeficiencyById,
+  deleteDeficiencyById,
+  getDeficiencyById,
+  getDeficiencies
+} from '../../../application/deficiency'
+import { pagination } from '../middleware'
+
 export const deficienciesRoutes = Router()
 
 /**
 * @swagger
 *
 * definitions:
-*   deficiencyCreate:
+*   DeficiencyCreate:
 *     type: object
 *     required:
 *       - name
@@ -15,14 +24,14 @@ export const deficienciesRoutes = Router()
 *         type: string
 *         example: Síndrome de Down
 *
-*   deficiencyUpdate:
+*   DeficiencyUpdate:
 *     type: object
 *     properties:
 *       name:
 *         type: string
 *         example: Síndrome de Down
 *
-*   deficiencyResponse:
+*   DeficiencyResponse:
 *     type: object
 *     required:
 *       - name
@@ -53,22 +62,26 @@ export const deficienciesRoutes = Router()
 *       content:
 *         application/json:
 *           schema:
-*             $ref: '#/definitions/deficiencyCreate'
+*             $ref: '#/definitions/DeficiencyCreate'
 *     responses:
 *       '201':
 *         description: Created
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/definitions/deficiencyResponse'
+*               $ref: '#/definitions/DeficiencyResponse'
 *       '400':
 *         description: Bad request
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/BadRequestError'
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.post('/', (req, res) => {
-  return res.status(201).json(req.body)
-})
+deficienciesRoutes.post('/', async (req, res, next) => createDeficiency.execute(req.body)
+  .then((deficiency) => res.status(201).json(deficiency))
+  .catch(next))
 
 /**
 * @swagger
@@ -77,19 +90,48 @@ deficienciesRoutes.post('/', (req, res) => {
 *   get:
 *     tags: ['Deficiency']
 *     summary: Get deficiencies list
+*     parameters:
+*       - $ref: '#/parameters/page'
+*       - $ref: '#/parameters/limit'
+*       - $ref: '#/parameters/order'
+*       - in: query
+*         name: name
+*         schema:
+*           type: string
+*         description: search by partial name (case insensitive and ignore accents)
 *     responses:
 *       '200':
 *         description: Ok
 *         content:
 *           application/json:
 *             schema:
-*               type: array
-*               items:
-*                 $ref: '#/definitions/deficiencyResponse'
+*               type: object
+*               properties:
+*                 data:
+*                   type: array
+*                   items:
+*                     $ref: '#/definitions/DeficiencyResponse'
+*                 page:
+*                   type: number
+*                   example: 2
+*                 limit:
+*                   type: number
+*                   example: 10
+*                 total:
+*                   type: number
+*                   example: 15
+*                 totalSearched:
+*                   type: number
+*                   example: 5
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.get('/', (req, res) => res.json([req.body]))
+deficienciesRoutes.get('/', pagination, (req, res, next) => {
+  const { page, limit, order } = res.locals
+  return getDeficiencies.execute({ page, limit, order })
+    .then((paginatedDeficiency) => res.status(200).json(paginatedDeficiency))
+    .catch(next)
+})
 
 /**
 * @swagger
@@ -101,18 +143,19 @@ deficienciesRoutes.get('/', (req, res) => res.json([req.body]))
 *     parameters:
 *       - in: path
 *         name: id
-*         required: true
 *     responses:
 *       '200':
 *         description: OK
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/definitions/deficiencyResponse'
+*               $ref: '#/definitions/DeficiencyResponse'
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.get('/:id', (req, res) => res.json(req.params))
+deficienciesRoutes.get('/:id', (req, res, next) => getDeficiencyById.execute(req.params.id)
+  .then((deficiency) => res.status(200).json(deficiency))
+  .catch(next))
 
 /**
 * @swagger
@@ -130,20 +173,22 @@ deficienciesRoutes.get('/:id', (req, res) => res.json(req.params))
 *       content:
 *         application/json:
 *           schema:
-*             $ref: '#/definitions/deficiencyUpdate'
+*             $ref: '#/definitions/DeficiencyUpdate'
 *     responses:
 *       '200':
 *         description: OK
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/definitions/deficiencyResponse'
+*               $ref: '#/definitions/DeficiencyResponse'
 *       '400':
 *         description: Bad request
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.patch('/:id', (req, res) => res.json({ params: req.params, deficiency: req.body }))
+deficienciesRoutes.patch('/:id', async (req, res, next) => updateDeficiencyById.execute(req.params.id, req.body)
+  .then((deficiency) => res.status(200).json(deficiency))
+  .catch(next))
 
 /**
 * @swagger
@@ -162,4 +207,6 @@ deficienciesRoutes.patch('/:id', (req, res) => res.json({ params: req.params, de
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.delete('/:id', (req, res) => res.status(204).send())
+deficienciesRoutes.delete('/:id', (req, res, next) => deleteDeficiencyById.execute(req.params.id)
+  .then(() => res.status(204).send())
+  .catch(next))

@@ -3,7 +3,7 @@ import path from 'path'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 
-import { web } from '../config'
+import { web } from '../../config'
 
 const swaggerOpts: swaggerJSDoc.Options = {
   swaggerDefinition: {
@@ -23,7 +23,7 @@ const swaggerOpts: swaggerJSDoc.Options = {
       }
     }
   },
-  apis: [path.join(__dirname, 'routes', '*.routes.ts')]
+  apis: [path.join(__dirname, '*.swagger.ts'), path.join(__dirname, '..', 'routes', '*.routes.ts')]
 }
 
 const openapiSpec = swaggerJSDoc(swaggerOpts)

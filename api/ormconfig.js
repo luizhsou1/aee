@@ -43,7 +43,7 @@ module.exports = {
   database: process.env.DB_NAME || 'aee',
   synchronize: process.env.DB_SYNC === 'true',
   logging: process.env.DB_LOGGING === 'true',
-  entities: ['./src/infra/db/entities/*.entity.{ts,js}'],
+  entities: ['./src/infra/db/entities/*.{ts,js}'],
   migrations: ['./src/infra/db/migrations/**/*.{ts,js}'],
   subscribers: ['./src/infra/db/subscriber/**/*.{ts,js}'],
   cli: {
