@@ -1,1 +1,2 @@
-export * from './typeorm-deficiency.repo'
+export * from './deficiency.repo'
+export * from './user.repo'

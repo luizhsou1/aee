@@ -8,7 +8,8 @@ import {
   UpdateDeficiencyById
 } from '../../../application/deficiency'
 import { IDeficiencyRepo } from '../../../domain'
-import { pagination } from '../middleware'
+import { pagination } from '../middlewares'
+import { isAtLeastCoordinator } from '../middlewares/auth.middleware'
 
 export const deficienciesRoutes = Router()
 
@@ -56,6 +57,8 @@ export const deficienciesRoutes = Router()
 *
 * /deficiencies:
 *   post:
+*     security:
+*       - bearerAuth: []
 *     tags: ['Deficiency']
 *     summary: Create an deficiency
 *     requestBody:
@@ -80,7 +83,7 @@ export const deficienciesRoutes = Router()
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.post('/', async (req, res, next) => container.resolve(CreateDeficiency)
+deficienciesRoutes.post('/', isAtLeastCoordinator, async (req, res, next) => container.resolve(CreateDeficiency)
   .execute(req.body)
   .then((deficiency) => res.status(201).json(deficiency))
   .catch(next))
@@ -90,6 +93,8 @@ deficienciesRoutes.post('/', async (req, res, next) => container.resolve(CreateD
 *
 * /deficiencies:
 *   get:
+*     security:
+*       - bearerAuth: []
 *     tags: ['Deficiency']
 *     summary: Get deficiencies list
 *     parameters:
@@ -128,7 +133,7 @@ deficienciesRoutes.post('/', async (req, res, next) => container.resolve(CreateD
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.get('/', pagination, (req, res, next) => {
+deficienciesRoutes.get('/', isAtLeastCoordinator, pagination, (req, res, next) => {
   const { page, limit, order } = res.locals
   const { name } = req.query as { [key: string]: string }
   return container.resolve<IDeficiencyRepo>('IDeficiencyRepo')
@@ -142,6 +147,8 @@ deficienciesRoutes.get('/', pagination, (req, res, next) => {
 *
 * /deficiencies/{id}:
 *   get:
+*     security:
+*       - bearerAuth: []
 *     tags: ['Deficiency']
 *     summary: Get deficiency by id
 *     parameters:
@@ -157,7 +164,7 @@ deficienciesRoutes.get('/', pagination, (req, res, next) => {
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.get('/:id', (req, res, next) => container.resolve(GetDeficiencyById)
+deficienciesRoutes.get('/:id', isAtLeastCoordinator, (req, res, next) => container.resolve(GetDeficiencyById)
   .execute(Number(req.params.id))
   .then((deficiency) => res.status(200).json(deficiency))
   .catch(next))
@@ -167,6 +174,8 @@ deficienciesRoutes.get('/:id', (req, res, next) => container.resolve(GetDeficien
 *
 * /deficiencies/{id}:
 *   patch:
+*     security:
+*       - bearerAuth: []
 *     tags: ['Deficiency']
 *     summary: Update deficiency by id
 *     parameters:
@@ -188,10 +197,20 @@ deficienciesRoutes.get('/:id', (req, res, next) => container.resolve(GetDeficien
 *               $ref: '#/definitions/DeficiencyResponse'
 *       '400':
 *         description: Bad request
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/BadRequestError'
+*       '404':
+*         description: Bad request
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/DeficiencyNotFoundError'
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.patch('/:id', async (req, res, next) => container.resolve(UpdateDeficiencyById)
+deficienciesRoutes.patch('/:id', isAtLeastCoordinator, async (req, res, next) => container.resolve(UpdateDeficiencyById)
   .execute(Number(req.params.id), req.body)
   .then((deficiency) => res.status(200).json(deficiency))
   .catch(next))
@@ -201,6 +220,8 @@ deficienciesRoutes.patch('/:id', async (req, res, next) => container.resolve(Upd
 *
 * /deficiencies/{id}:
 *   delete:
+*     security:
+*       - bearerAuth: []
 *     tags: ['Deficiency']
 *     summary: Delete deficiency by id
 *     parameters:
@@ -210,10 +231,22 @@ deficienciesRoutes.patch('/:id', async (req, res, next) => container.resolve(Upd
 *     responses:
 *       '204':
 *         description: No content
+*       '400':
+*         description: Bad request
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/BadRequestError'
+*       '404':
+*         description: Bad request
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/DeficiencyNotFoundError'
 *       '500':
 *         description: Internal server error
 */
-deficienciesRoutes.delete('/:id', (req, res, next) => container.resolve(DeleteDeficiencyById)
+deficienciesRoutes.delete('/:id', isAtLeastCoordinator, (req, res, next) => container.resolve(DeleteDeficiencyById)
   .execute(Number(req.params.id))
   .then(() => res.status(204).send())
   .catch(next))

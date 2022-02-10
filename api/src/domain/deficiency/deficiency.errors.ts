@@ -1,6 +1,6 @@
-import { NotFoundError } from '../errors/not-found.error'
+import { NotFoundError } from '../errors'
 
-export class DeficiencyNotFound extends NotFoundError {
+export class DeficiencyNotFoundError extends NotFoundError {
   constructor () {
     super('Deficiência não encontrada')
   }

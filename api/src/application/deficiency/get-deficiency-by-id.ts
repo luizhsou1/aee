@@ -1,6 +1,6 @@
 import { inject, singleton } from 'tsyringe'
 
-import { Deficiency, DeficiencyNotFound, IDeficiencyRepo } from '../../domain'
+import { Deficiency, DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain'
 import { isIdOrFail } from '../../domain/validations'
 import { IApplicationService } from '../application.service'
 
@@ -13,14 +13,14 @@ export class GetDeficiencyById implements IApplicationService {
 
   /**
   * @throws ValidationError
-  * @throws DeficiencyNotFound
+  * @throws DeficiencyNotFoundError
   */
   async execute (id: number): Promise<Deficiency> {
     isIdOrFail(id)
 
     const deficiency = await this.deficiencyRepo.findById(id)
     if (!deficiency) {
-      throw new DeficiencyNotFound()
+      throw new DeficiencyNotFoundError()
     }
 
     return deficiency

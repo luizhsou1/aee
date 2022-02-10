@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer'
 import mergeDeep from 'merge-deep'
 
-type ClassConstructor<T> = {
+export type ClassConstructor<T> = {
   new (...args: any[]): T;
 };
 

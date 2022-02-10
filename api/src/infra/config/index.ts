@@ -1,6 +1,6 @@
 interface IWebConfig {
   port: number,
-  serverUrl: string
+  serverBaseUrl: string
 }
 
 interface IDbConfig {}
@@ -13,7 +13,7 @@ interface IConfig {
 const config: IConfig = {
   web: {
     port: Number(process.env.PORT) || 4000,
-    serverUrl: process.env.SERVER_URL || 'http://localhost:4000/api'
+    serverBaseUrl: process.env.SERVER_BASE_URL || 'http://localhost:4000'
   },
   db: {}
 }

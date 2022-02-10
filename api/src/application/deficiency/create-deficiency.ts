@@ -1,7 +1,6 @@
 import { inject, singleton } from 'tsyringe'
 
 import { Deficiency, IDeficiencyRepo } from '../../domain'
-import { getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
 
 @singleton()
@@ -15,9 +14,7 @@ export class CreateDeficiency implements IApplicationService {
   * @throws ValidationError
   */
   async execute (data: object): Promise<Deficiency> {
-    const deficiency = getInstanceOf(Deficiency, data)
-    await deficiency.validateOrFail()
-
+    const deficiency = await Deficiency.create(data)
     return this.deficiencyRepo.save(deficiency)
   }
 }

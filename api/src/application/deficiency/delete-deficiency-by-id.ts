@@ -1,6 +1,6 @@
 import { inject, singleton } from 'tsyringe'
 
-import { DeficiencyNotFound, IDeficiencyRepo } from '../../domain'
+import { DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain'
 import { isIdOrFail } from '../../domain/validations'
 import { IApplicationService } from '../application.service'
 
@@ -13,14 +13,14 @@ export class DeleteDeficiencyById implements IApplicationService {
 
   /**
   * @throws ValidationError
-  * @throws DeficiencyNotFound
+  * @throws DeficiencyNotFoundError
   */
   async execute (id: number): Promise<void> {
     isIdOrFail(id)
 
     const exists = await this.deficiencyRepo.exists(id)
     if (!exists) {
-      throw new DeficiencyNotFound()
+      throw new DeficiencyNotFoundError()
     }
 
     await this.deficiencyRepo.deleteById(id)

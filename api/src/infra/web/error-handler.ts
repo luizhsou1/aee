@@ -30,7 +30,8 @@ function setup (app: Application) {
 
     const error: IError = {
       error: 'InternalServerError',
-      message: `Internal Server Error - ${err.message}`
+      message: `Internal Server Error - ${err.message}`,
+      stack: err.stack
     }
     return res.status(500).json(error)
   })

@@ -9,7 +9,10 @@ export async function connectToDatabase (): Promise<void> {
   try {
     connection = await createConnection({
       ...options,
-      entities: [path.join(__dirname, 'entities', '*.{ts,js}')],
+      entities: [
+        path.join(__dirname, '..', '..', 'domain', '**', '*.entity.{ts,js}'), // Entities
+        path.join(__dirname, '..', '..', 'domain', '**', '*.vo.{ts,js}') // Value Objects
+      ],
       migrations: [path.join(__dirname, 'migrations', '**', '*.{ts,js}')],
       subscribers: [path.join(__dirname, 'subscriber', '**', '*.{ts,js}')]
     })

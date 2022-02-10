@@ -1,18 +1,20 @@
 import { Application } from 'express'
 import path from 'path'
 import swaggerJSDoc from 'swagger-jsdoc'
-import swaggerUi from 'swagger-ui-express'
+import swaggerUi, { SwaggerUiOptions } from 'swagger-ui-express'
 
 import { web } from '../../config'
+
+const TITLE = 'AEE REST API'
 
 const swaggerOpts: swaggerJSDoc.Options = {
   swaggerDefinition: {
     openapi: '3.0.0',
     info: {
-      title: 'AEE project REST API',
+      title: TITLE,
       version: 'version'
     },
-    servers: [{ url: web.serverUrl }],
+    servers: [{ url: `${web.serverBaseUrl}/api` }],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -27,7 +29,13 @@ const swaggerOpts: swaggerJSDoc.Options = {
 }
 
 const openapiSpec = swaggerJSDoc(swaggerOpts)
-const swaggerOptions = { customCss: '.swagger-ui section.models, .topbar { display: none; }' }
+const swaggerOptions: SwaggerUiOptions = {
+  customSiteTitle: TITLE,
+  customCss: '.swagger-ui section.models, .topbar { display: none; }',
+  swaggerOptions: {
+    persistAuthorization: true
+  }
+}
 
 function setup (app: Application) {
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, swaggerOptions))

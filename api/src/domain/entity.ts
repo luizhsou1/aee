@@ -1,32 +1,20 @@
 import { Expose } from 'class-transformer'
-import { validateOrReject } from 'class-validator'
+import { IsDate, IsNumber, IsOptional } from 'class-validator'
+import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+export abstract class DomainEntity {
+  @Expose() @IsOptional() @IsNumber()
+  @PrimaryGeneratedColumn()
+  private id?: number
 
-import { ValidationError } from './errors'
+  @Expose()@IsOptional()@IsDate()
+  @CreateDateColumn({ name: 'created_at' })
+  private createdAt: Date
 
-interface IValidateOptions {
-  skipMissingProperties?: boolean
-}
+  @Expose() @IsOptional() @IsDate()
+  @UpdateDateColumn({ name: 'updated_at' })
+  private updatedAt: Date
 
-export class Entity {
-  @Expose() id?: number
-  @Expose() private createdAt?: Date
-  @Expose() private updatedAt?: Date
-
-  /**
-   * @param skipMissingProperties Caso true, pula campos 'undefined'
-   * @throws ValidationError
-   */
-  async validateOrFail ({
-    skipMissingProperties = false
-  }: IValidateOptions = {}) {
-    try {
-      await validateOrReject(this, { skipMissingProperties })
-    } catch (errors: any) {
-      throw new ValidationError(
-        'One or more input validation errors occurred',
-        undefined,
-        errors
-      )
-    }
+  getId (): number | undefined {
+    if (this.id) return this.id
   }
 }
