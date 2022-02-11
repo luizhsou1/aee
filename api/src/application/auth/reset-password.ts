@@ -49,8 +49,9 @@ export class ResetPassword implements IApplicationService {
       throw new PasswordIsEqualError()
     }
 
-    await user.setPasswordHash(password)
+    await user.setAndHashPassword(password)
     await this.userRepo.save(user)
+
     await this.userRepo.deleteUserToken(userToken)
   }
 }

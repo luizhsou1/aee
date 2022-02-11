@@ -56,11 +56,15 @@ export class User extends DomainEntity {
     return user
   }
 
-  async setPasswordHash (password?: string) {
-    const passwordToHash = password || this.password
-    if (passwordToHash) {
-      this.password = await hash(passwordToHash, User.SALT_ROUNDS)
+  async hashPassword () {
+    if (this.password) {
+      this.password = await hash(this.password, User.SALT_ROUNDS)
     }
+  }
+
+  async setAndHashPassword (password: string) {
+    this.password = password
+    await this.hashPassword()
   }
 
   async passwordIsEquals (password: string): Promise<boolean> {

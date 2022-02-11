@@ -17,7 +17,7 @@ export class CreateUser implements IApplicationService {
   async execute (data: object): Promise<User> {
     const user = await User.create(data)
 
-    await user.setPasswordHash()
+    await user.hashPassword()
 
     const userSaved = await this.userRepo.save(user)
     userSaved.clearPassword()
