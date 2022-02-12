@@ -26,8 +26,8 @@ export class EmailOrPasswordIncorrectError extends UnprocessableEntityError {
 }
 
 export class TokenNotFoundError extends NotFoundError {
-  constructor () {
-    super('Token não encontrado')
+  constructor (message: string) {
+    super(message)
   }
 }
 

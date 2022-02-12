@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { container } from 'tsyringe'
 
 import { SignIn, ForgotPassword, ResetPassword } from '../../../application/auth'
+import { RefreshToken } from '../../../application/auth/refresh-token'
 
 export const authRoutes = Router()
 
@@ -21,6 +22,15 @@ export const authRoutes = Router()
 *       password:
 *         type: string
 *         example: projetoaee2022
+*
+*   RefreshToken:
+*     type: object
+*     required:
+*       - refreshToken
+*     properties:
+*       refreshToken:
+*         type: string
+*         example: some_refresh_token
 *
 *   ResetPassword:
 *     type: object
@@ -58,6 +68,51 @@ export const authRoutes = Router()
 *                user:
 *                  type: object
 *                  $ref: '#/definitions/UserResponse'
+*                accessToken:
+*                  type: string
+*                  example: some_access_token
+*                refreshToken:
+*                  type: string
+*                  example: some_refresh_token
+*       '422':
+*         description: Unprocessable Entity
+*         content:
+*           application/json:
+*             schema:
+*               oneOf:
+*                 - $ref: '#/definitions/EmailOrPasswordIncorrectError'
+*       '500':
+*         description: Internal server error
+*/
+authRoutes.post('/signin', async (req, res, next) => container.resolve(SignIn)
+  .execute(req.body.email, req.body.password)
+  .then((result) => res.status(200).json(result))
+  .catch(next))
+
+/**
+* @swagger
+*
+* /auth/refresh-token:
+*   post:
+*     tags: ['Auth']
+*     summary: Get access token by refresh token
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/RefreshToken'
+*     responses:
+*       '200':
+*         description: OK
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                user:
+*                  type: object
+*                  $ref: '#/definitions/UserResponse'
 *                token:
 *                  type: string
 *                  example: some_token
@@ -71,8 +126,8 @@ export const authRoutes = Router()
 *       '500':
 *         description: Internal server error
 */
-authRoutes.post('/signin', async (req, res, next) => container.resolve(SignIn)
-  .execute(req.body.email, req.body.password)
+authRoutes.post('/refresh-token', async (req, res, next) => container.resolve(RefreshToken)
+  .execute(req.body.refreshToken)
   .then((result) => res.status(200).json(result))
   .catch(next))
 
@@ -129,7 +184,7 @@ authRoutes.post('/forgot-password/:email', async (req, res, next) => container.r
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/definitions/TokenExpiredError'
+*               $ref: '#/definitions/ExpiredTokenError'
 *       '404':
 *         description: Not Found
 *         content:

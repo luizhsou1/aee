@@ -1,4 +1,9 @@
-import { User, UserToken } from '.'
+import { TokenType, User, UserToken } from '.'
+
+export interface IFindUserTokenOptions {
+  token: string,
+  type?: TokenType
+}
 
 export interface IUserRepo {
   /**
@@ -17,9 +22,9 @@ export interface IUserRepo {
   /**
    * Find UserToken by Token
    */
-  findUserTokenByToken(token: string): Promise<UserToken | undefined>
+  findUserToken(options: IFindUserTokenOptions): Promise<UserToken | undefined>
   /**
-   * Find UserToken by Token
+   * Delete UserToken by Token
    */
   deleteUserToken(userToken: UserToken): Promise<void>
 }

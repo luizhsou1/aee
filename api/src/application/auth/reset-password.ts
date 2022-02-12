@@ -3,7 +3,7 @@ import { IsNotEmpty } from 'class-validator'
 import { inject, singleton } from 'tsyringe'
 
 import { ExpiredTokenError, PasswordIsEqualError } from '.'
-import { IUserRepo, IsPassword } from '../../domain'
+import { IUserRepo, IsPassword, TokenType } from '../../domain'
 import { validateOrFail } from '../../domain/validations'
 import { getAppBaseUrl, getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
@@ -28,19 +28,20 @@ export class ResetPassword implements IApplicationService {
 
   /**
    * @throws ValidationError
-   * @throws UserNotFoundError
+   * @throws TokenNotFoundError
+   * @throws ExpiredTokenError
    */
   async execute (token: string, password: string): Promise<void> {
     await validateOrFail(getInstanceOf(ResetPasswordInput, { token, password }))
 
-    const userToken = await this.userRepo.findUserTokenByToken(token)
+    const userToken = await this.userRepo.findUserToken({ token, type: TokenType.RECOVER_PASSWORD_TOKEN })
     if (!userToken) {
-      throw new TokenNotFoundError()
+      throw new TokenNotFoundError('Recover password token não encontrado')
     }
 
-    const isExpired = new Date() > userToken.getExpirationDate()
-    if (isExpired) {
-      throw new ExpiredTokenError('Reset password token expired!')
+    if (userToken.isExpired()) {
+      await this.userRepo.deleteUserToken(userToken)
+      throw new ExpiredTokenError('Reset password token expirado!')
     }
 
     const user = userToken.getUser()

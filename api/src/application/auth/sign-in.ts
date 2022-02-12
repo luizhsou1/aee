@@ -1,10 +1,10 @@
 
 import { Expose } from 'class-transformer'
 import { IsEmail, IsNotEmpty } from 'class-validator'
-import { sign } from 'jsonwebtoken'
 import { inject, singleton } from 'tsyringe'
 
-import { User, IUserRepo, IsPassword } from '../../domain'
+import { IUserRepo, IsPassword } from '../../domain'
+import { GenerateTokens, IGenerateTokensReturn } from '../../domain/user/generate-tokens.service'
 import { validateOrFail } from '../../domain/validations'
 import { getInstanceOf, getJwtExpiresIn, getJwtSecret } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
@@ -17,27 +17,22 @@ class SignInInput {
   @Expose() @IsNotEmpty() @IsPassword()
   private password: string
 }
-
-export interface ISignInReturn {
-  user: User,
-  token: string
-}
-
 @singleton()
 export class SignIn implements IApplicationService {
-  private readonly jwtSecret = getJwtSecret()
-  private readonly jwtExpiresIn = getJwtExpiresIn()
+  private static readonly JWT_SECRET = getJwtSecret()
+  private static readonly JWT_EXPIRES_IN = getJwtExpiresIn()
 
   constructor (
     @inject('IUserRepo')
-    private readonly userRepo: IUserRepo
+    private readonly userRepo: IUserRepo,
+    private readonly generateTokens: GenerateTokens
   ) {}
 
   /**
    * @throws ValidationError
    * @throws EmailOrPasswordIncorrectError
    */
-  async execute (email: string, password: string): Promise<ISignInReturn> {
+  async execute (email: string, password: string): Promise<IGenerateTokensReturn> {
     await validateOrFail(getInstanceOf(SignInInput, { email, password }))
 
     const user = await this.userRepo.findByEmail(email)
@@ -50,13 +45,6 @@ export class SignIn implements IApplicationService {
       throw new EmailOrPasswordIncorrectError()
     }
 
-    user.clearPassword()
-
-    const token = sign({ email, name: user.getName(), role: user.getRole() }, this.jwtSecret, {
-      subject: user.getId()?.toString(),
-      expiresIn: this.jwtExpiresIn
-    })
-
-    return { user, token }
+    return this.generateTokens.execute(user)
   }
 }

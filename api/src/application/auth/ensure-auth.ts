@@ -9,7 +9,7 @@ import { AuthorizationError, ExpiredTokenError, InvalidTokenError } from './auth
 
 @singleton()
 export class EnsureAuth implements IApplicationService {
-  private readonly jwtSecret = getJwtSecret()
+  private static readonly JWT_SECRET = getJwtSecret()
 
   /**
    * @throws ValidationError
@@ -46,7 +46,7 @@ export class EnsureAuth implements IApplicationService {
         email,
         name,
         role: userRole
-      } = verify(token, this.jwtSecret) as { sub: string, email: string, name: string, role: UserRole }
+      } = verify(token, EnsureAuth.JWT_SECRET) as { sub: string, email: string, name: string, role: UserRole }
 
       checkAuthorizationOrFail(userRole)
 

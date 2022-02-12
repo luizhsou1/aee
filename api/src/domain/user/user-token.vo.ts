@@ -1,7 +1,8 @@
 import { Expose } from 'class-transformer'
+import crypto from 'crypto'
 import { Column, CreateDateColumn, Entity, ManyToOne } from 'typeorm'
 
-import { generateUuid } from '../../shared/utils'
+import { getDaysToExpireRecoverPasswordToken, getDaysToExpireRefreshToken } from '../../shared/utils'
 import { User } from './user.entity'
 
 export enum TokenType {
@@ -11,8 +12,8 @@ export enum TokenType {
 
 @Entity()
 export class UserToken {
-  private static readonly DAYS_TO_EXPIRE_RECOVER_PASSWORD_TOKEN = 1
-  private static readonly DAYS_TO_EXPIRE_REFRESH_TOKEN = 1
+  private static readonly DAYS_TO_EXPIRE_RECOVER_PASSWORD_TOKEN = getDaysToExpireRecoverPasswordToken()
+  private static readonly DAYS_TO_EXPIRE_REFRESH_TOKEN = getDaysToExpireRefreshToken()
 
   @Expose()
   @Column('text', { primary: true })
@@ -38,30 +39,28 @@ export class UserToken {
     return this.token
   }
 
-  getExpirationDate (): Date {
-    return this.expirationDate
-  }
-
   getUser (): User {
     return this.user
+  }
+
+  isExpired (): boolean {
+    return new Date() > this.expirationDate
   }
 
   private constructor (user: User, type: TokenType, expirationDate: Date) {
     this.user = user
     this.type = type
-    this.token = generateUuid()
+    this.token = this.generateToken()
     this.expirationDate = expirationDate
   }
 
-  static createRecoverPasswordToken (user: User) {
-    const expirationDate = new Date()
-    expirationDate.setDate(expirationDate.getDate() + UserToken.DAYS_TO_EXPIRE_RECOVER_PASSWORD_TOKEN)
-    return new UserToken(user, TokenType.RECOVER_PASSWORD_TOKEN, expirationDate)
-  }
-
-  static createRefreshToken (user: User) {
+  static create (user: User, type: TokenType) {
     const expirationDate = new Date()
     expirationDate.setDate(expirationDate.getDate() + UserToken.DAYS_TO_EXPIRE_REFRESH_TOKEN)
-    return new UserToken(user, TokenType.RECOVER_PASSWORD_TOKEN, expirationDate)
+    return new UserToken(user, type, expirationDate)
+  }
+
+  private generateToken (): string {
+    return crypto.randomBytes(24).toString('hex')
   }
 }

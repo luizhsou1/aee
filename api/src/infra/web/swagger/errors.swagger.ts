@@ -53,7 +53,7 @@
 *         type: string
 *         example: Stack trace details
 *
-*   TokenExpiredError:
+*   ExpiredTokenError:
 *     type: object
 *     required:
 *       - error
@@ -61,10 +61,9 @@
 *     properties:
 *       error:
 *         type: string
-*         example: TokenExpiredError
+*         example: ExpiredTokenError
 *       message:
 *         type: string
-*         example: 'Reset password token expirado'
 *       stack:
 *         type: string
 *         example: Stack trace details

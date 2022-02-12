@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm'
 
-import { User, IUserRepo, UserEmailAlreadyExistsError, UserToken } from '../../../domain'
+import { User, IUserRepo, UserEmailAlreadyExistsError, UserToken, IFindUserTokenOptions } from '../../../domain'
 
 export class UserRepo implements IUserRepo {
   constructor (
@@ -28,9 +28,9 @@ export class UserRepo implements IUserRepo {
     return await this.userTokenRepo.save(userToken)
   }
 
-  async findUserTokenByToken (token: string): Promise<UserToken | undefined> {
+  async findUserToken ({ token, type }: IFindUserTokenOptions): Promise<UserToken | undefined> {
     // @ts-ignore
-    return await this.userTokenRepo.findOne({ token })
+    return await this.userTokenRepo.findOne({ token, type })
   }
 
   async deleteUserToken (userToken: UserToken): Promise<void> {
