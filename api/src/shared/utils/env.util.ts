@@ -1,4 +1,4 @@
-const getEnv = (): string => {
+export const getEnv = (): string => {
   const env = process.env.NODE_ENV || 'dev'
   return ['dev', 'test', 'prod'].includes(env) ? env : 'dev'
 }

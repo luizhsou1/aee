@@ -25,7 +25,7 @@ const swaggerOpts: swaggerJSDoc.Options = {
       }
     }
   },
-  apis: [path.join(__dirname, '*.swagger.ts'), path.join(__dirname, '..', 'routes', '*.routes.ts')]
+  apis: [path.join(__dirname, '*.swagger.{ts,js}'), path.join(__dirname, '..', 'routes', '*.routes.{ts,js}')]
 }
 
 const openapiSpec = swaggerJSDoc(swaggerOpts)
