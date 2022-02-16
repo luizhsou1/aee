@@ -1,6 +1,6 @@
 import { inject, singleton } from 'tsyringe'
 
-import { Deficiency, DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain'
+import { Deficiency, DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain/deficiency'
 import { isIdOrFail } from '../../domain/validations'
 import { IApplicationService } from '../application.service'
 

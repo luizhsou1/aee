@@ -4,7 +4,8 @@ import nodemailer, { Transporter } from 'nodemailer'
 import path from 'path'
 
 import { IEmailProvider } from '../../application/providers'
-import { web } from '../config'
+import { DataObject } from '../../shared/types'
+import { getServerBaseUrl } from '../../shared/utils'
 
 export class EtherealEmailProvider implements IEmailProvider {
   private client?: Transporter
@@ -28,7 +29,7 @@ export class EtherealEmailProvider implements IEmailProvider {
     }).catch((err) => console.error(`Error registering 'nodemailer' | ${err}`))
   }
 
-  async send (to: string, subject: string, template: string, variables: { [key: string]: any }): Promise<void> {
+  async send (to: string, subject: string, template: string, variables: DataObject = {}): Promise<void> {
     if (!this.client) {
       console.warn('Client nodemailer is not registered yet')
       return
@@ -40,7 +41,7 @@ export class EtherealEmailProvider implements IEmailProvider {
     const templateParse = handlebars.compile(templateFileContent)
     const templateHtml = templateParse({
       ...variables,
-      logoUrl: `${web.serverBaseUrl}/images/logo.png`
+      logoUrl: `${getServerBaseUrl()}/images/logo.png`
     })
 
     const info = await this.client.sendMail({

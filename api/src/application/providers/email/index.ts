@@ -1,3 +1,5 @@
+import { DataObject } from '../../../shared/types'
+
 export interface IEmailProvider {
-  send(to: string, subject: string, path: string, variables: { [key: string]: any }): Promise<void>
+  send(to: string, subject: string, template: string, variables?: DataObject): Promise<void>
 }

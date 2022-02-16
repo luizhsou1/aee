@@ -1,0 +1,69 @@
+name: Continuos Integration API
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - api/**
+  pull_request:
+    branches:
+      - master
+    paths:
+      - api/**
+
+jobs:
+  check-application:
+    name: 'Check Application'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.3.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check linting
+        run: npm run lint
+
+      - name: Check tests
+        run: npm run test:cov
+
+      - name: Send coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./api/coverage/lcov.info
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: clone env file
+        run: cp .env.sample .env
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./api
+          push: true
+          tags: luizhsou1/aee:latest

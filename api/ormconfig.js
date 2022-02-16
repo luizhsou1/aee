@@ -37,7 +37,9 @@ class CustomNamingStrategy extends DefaultNamingStrategy {
 module.exports = {
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT) || 5400,
+  port: process.env.NODE_ENV === 'test' 
+    ? (parseInt(process.env.DB_PORT_TEST) || 5401)
+    : (parseInt(process.env.DB_PORT) || 5400),
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASS || 'postgres',
   database: process.env.DB_NAME || 'aee',

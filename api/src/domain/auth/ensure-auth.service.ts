@@ -1,14 +1,14 @@
 import { verify } from 'jsonwebtoken'
 import { singleton } from 'tsyringe'
 
-import { User, UserRole } from '../../domain'
-import { ForbiddenError } from '../../domain/errors'
 import { getInstanceOf, getJwtSecret } from '../../shared/utils'
-import { IApplicationService } from '../application.service'
+import { IDomainService } from '../domain.service'
+import { ForbiddenError } from '../errors'
+import { User, UserRole } from '../user'
 import { AuthorizationError, ExpiredTokenError, InvalidTokenError } from './auth.errors'
 
 @singleton()
-export class EnsureAuth implements IApplicationService {
+export class EnsureAuth implements IDomainService {
   private static readonly JWT_SECRET = getJwtSecret()
 
   /**

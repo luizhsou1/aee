@@ -1,5 +1,5 @@
-import { UserRole } from '../../domain'
-import { ForbiddenError, NotFoundError, UnauthorizedError, UnprocessableEntityError } from '../../domain/errors'
+import { ForbiddenError, NotFoundError, UnauthorizedError, UnprocessableEntityError } from '../errors'
+import { UserRole } from '../user'
 
 export class InvalidTokenError extends UnauthorizedError {
   constructor () {
@@ -19,7 +19,7 @@ export class AuthorizationError extends ForbiddenError {
   }
 }
 
-export class EmailOrPasswordIncorrectError extends UnprocessableEntityError {
+export class EmailOrPasswordIncorrectError extends UnauthorizedError {
   constructor () {
     super('Usuário ou senha incorreto!')
   }

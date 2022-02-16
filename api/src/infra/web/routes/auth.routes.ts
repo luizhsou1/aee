@@ -3,6 +3,8 @@ import { container } from 'tsyringe'
 
 import { SignIn, ForgotPassword, ResetPassword } from '../../../application/auth'
 import { RefreshToken } from '../../../application/auth/refresh-token'
+import { UpdateUserById } from '../../../application/user'
+import { isAtLeastTeacher } from '../middlewares/auth.middleware'
 
 export const authRoutes = Router()
 
@@ -35,7 +37,15 @@ export const authRoutes = Router()
 *   ResetPassword:
 *     type: object
 *     required:
-*       - token
+*       - password
+*     properties:
+*       password:
+*         type: string
+*         example: 2022projetoaee
+*
+*   ChangePassword:
+*     type: object
+*     required:
 *       - password
 *     properties:
 *       password:
@@ -74,7 +84,7 @@ export const authRoutes = Router()
 *                refreshToken:
 *                  type: string
 *                  example: some_refresh_token
-*       '422':
+*       '401':
 *         description: Unprocessable Entity
 *         content:
 *           application/json:
@@ -116,13 +126,6 @@ authRoutes.post('/signin', async (req, res, next) => container.resolve(SignIn)
 *                token:
 *                  type: string
 *                  example: some_token
-*       '422':
-*         description: Unprocessable Entity
-*         content:
-*           application/json:
-*             schema:
-*               oneOf:
-*                 - $ref: '#/definitions/EmailOrPasswordIncorrectError'
 *       '500':
 *         description: Internal server error
 */
@@ -135,7 +138,7 @@ authRoutes.post('/refresh-token', async (req, res, next) => container.resolve(Re
 * @swagger
 *
 * /auth/forgot-password/{email}:
-*   post:
+*   get:
 *     tags: ['Auth']
 *     summary: Forgot Password
 *     parameters:
@@ -154,7 +157,7 @@ authRoutes.post('/refresh-token', async (req, res, next) => container.resolve(Re
 *       '500':
 *         description: Internal server error
 */
-authRoutes.post('/forgot-password/:email', async (req, res, next) => container.resolve(ForgotPassword)
+authRoutes.get('/forgot-password/:email', async (req, res, next) => container.resolve(ForgotPassword)
   .execute(req.params.email)
   .then(() => res.status(204).send())
   .catch(next))
@@ -203,5 +206,44 @@ authRoutes.post('/forgot-password/:email', async (req, res, next) => container.r
 */
 authRoutes.post('/reset-password', async (req, res, next) => container.resolve(ResetPassword)
   .execute(req.query.token as string, req.body.password)
+  .then(() => res.status(204).send())
+  .catch(next))
+
+/**
+* @swagger
+*
+* /auth/change-password:
+*   post:
+*     security:
+*       - bearerAuth: []
+*     tags: ['Auth']
+*     summary: Change Password
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/definitions/ChangePassword'
+*     responses:
+*       '204':
+*         description: No Content
+*       '404':
+*         description: Not Found
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/definitions/UserNotFoundError'
+*       '422':
+*         description: Unprocessable Entity
+*         content:
+*           application/json:
+*             schema:
+*               oneOf:
+*                 - $ref: '#/definitions/PasswordIsEqualError'
+*       '500':
+*         description: Internal server error
+*/
+authRoutes.post('/change-password', isAtLeastTeacher, async (req, res, next) => container.resolve(UpdateUserById)
+  .execute(Number(res.locals.user?.id), { password: req.body.password })
   .then(() => res.status(204).send())
   .catch(next))

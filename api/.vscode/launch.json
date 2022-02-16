@@ -15,6 +15,17 @@
       "outFiles": [
         "${workspaceFolder}/**/*.js"
       ]
+    },
+    {
+      "name": "Jest Current File",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "${file}"
+      ],
+      "console": "integratedTerminal"
     }
   ]
 }

@@ -12,6 +12,10 @@ export interface IUserRepo {
    */
   save(user: User): Promise<User>
   /**
+   * Find Deficiency by id
+   */
+   findById(id: number): Promise<User | undefined>
+  /**
    * Find User by email
    */
   findByEmail (email: string): Promise<User | undefined>

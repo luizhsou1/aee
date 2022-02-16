@@ -3,9 +3,13 @@ import { Expose } from 'class-transformer'
 import { IsNotEmpty } from 'class-validator'
 import { inject, singleton } from 'tsyringe'
 
-import { ExpiredTokenError, TokenNotFoundError } from '.'
-import { IUserRepo, TokenType } from '../../domain'
-import { GenerateTokens, IGenerateTokensReturn } from '../../domain/user/generate-tokens.service'
+import {
+  ExpiredTokenError,
+  TokenNotFoundError,
+  GenerateAccessAndRefreshToken,
+  IGenerateAccessAndRefreshTokenReturn
+} from '../../domain/auth'
+import { IUserRepo, TokenType, User } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
 import { getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
@@ -20,7 +24,7 @@ export class RefreshToken implements IApplicationService {
   constructor (
     @inject('IUserRepo')
     private readonly userRepo: IUserRepo,
-    private readonly generateTokens: GenerateTokens
+    private readonly generateAccessAndRefreshToken: GenerateAccessAndRefreshToken
   ) {}
 
   /**
@@ -28,7 +32,7 @@ export class RefreshToken implements IApplicationService {
    * @throws TokenNotFoundError
    * @throws ExpiredTokenError
    */
-  async execute (refreshToken: string): Promise<IGenerateTokensReturn> {
+  async execute (refreshToken: string): Promise<IGenerateAccessAndRefreshTokenReturn & { user: User }> {
     await validateOrFail(getInstanceOf(RefreshTokenInput, { refreshToken }))
 
     const userRefreshToken = await this.userRepo.findUserToken({ token: refreshToken, type: TokenType.REFRESH_TOKEN })
@@ -41,10 +45,13 @@ export class RefreshToken implements IApplicationService {
       throw new ExpiredTokenError('Refresh token expirado!')
     }
 
-    const result = this.generateTokens.execute(userRefreshToken.getUser())
+    const tokens = await this.generateAccessAndRefreshToken.execute(userRefreshToken.getUser())
 
     await this.userRepo.deleteUserToken(userRefreshToken)
 
-    return result
+    const user = userRefreshToken.getUser()
+    user.clearPassword()
+
+    return { ...tokens, user }
   }
 }

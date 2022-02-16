@@ -12,7 +12,7 @@ export class Deficiency extends DomainEntity {
   @Column('text')
   private name: string
 
-  static async create (data: object, options?: IValidateOptions): Promise<Deficiency> {
+  static async create (data: Record<string, any>, options?: IValidateOptions): Promise<Deficiency> {
     const deficiency = getInstanceOf(Deficiency, data)
     await validateOrFail(deficiency, options)
     return deficiency

@@ -1,13 +1,15 @@
 import { container } from 'tsyringe'
 
 import { IEmailProvider } from '../../application/providers'
-import { IDeficiencyRepo, IUserRepo } from '../../domain'
+import { IDeficiencyRepo } from '../../domain/deficiency'
+import { IUserRepo } from '../../domain/user'
 import { UserRepo, DeficiencyRepo } from '../../infra/db/repositories'
-import { EtherealEmailProvider } from '../../infra/email'
+import { EtherealEmailProvider, ConsoleEmailProvider } from '../../infra/email'
+import { isTest } from '../utils'
 
 container.registerInstance<IEmailProvider>(
   'IEmailProvider',
-  new EtherealEmailProvider()
+  isTest() ? new ConsoleEmailProvider() : new EtherealEmailProvider()
 )
 
 container.registerSingleton<IDeficiencyRepo>(

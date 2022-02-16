@@ -3,18 +3,18 @@ import { Expose } from 'class-transformer'
 import { IsEmail, IsNotEmpty } from 'class-validator'
 import { inject, singleton } from 'tsyringe'
 
-import { IUserRepo, IsPassword } from '../../domain'
-import { GenerateTokens, IGenerateTokensReturn } from '../../domain/user/generate-tokens.service'
+import { GenerateAccessAndRefreshToken, IGenerateAccessAndRefreshTokenReturn } from '../../domain/auth'
+import { EmailOrPasswordIncorrectError } from '../../domain/auth/auth.errors'
+import { IUserRepo, User } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
 import { getInstanceOf, getJwtExpiresIn, getJwtSecret } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
-import { EmailOrPasswordIncorrectError } from './auth.errors'
 
 class SignInInput {
   @Expose() @IsEmail()
   private email: string
 
-  @Expose() @IsNotEmpty() @IsPassword()
+  @Expose() @IsNotEmpty()
   private password: string
 }
 @singleton()
@@ -25,14 +25,14 @@ export class SignIn implements IApplicationService {
   constructor (
     @inject('IUserRepo')
     private readonly userRepo: IUserRepo,
-    private readonly generateTokens: GenerateTokens
+    private readonly generateAccessAndRefreshToken: GenerateAccessAndRefreshToken
   ) {}
 
   /**
    * @throws ValidationError
    * @throws EmailOrPasswordIncorrectError
    */
-  async execute (email: string, password: string): Promise<IGenerateTokensReturn> {
+  async execute (email: string, password: string): Promise<IGenerateAccessAndRefreshTokenReturn & { user: User }> {
     await validateOrFail(getInstanceOf(SignInInput, { email, password }))
 
     const user = await this.userRepo.findByEmail(email)
@@ -40,11 +40,15 @@ export class SignIn implements IApplicationService {
       throw new EmailOrPasswordIncorrectError()
     }
 
-    const passwordIsEqual = await user.passwordIsEquals(password)
+    const passwordIsEqual = await user.passwordIsEqual(password)
     if (!passwordIsEqual) {
       throw new EmailOrPasswordIncorrectError()
     }
 
-    return this.generateTokens.execute(user)
+    const tokens = await this.generateAccessAndRefreshToken.execute(user)
+
+    user.clearPassword()
+
+    return { ...tokens, user }
   }
 }

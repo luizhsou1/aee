@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer'
 import { IsEmail } from 'class-validator'
 import { inject, singleton } from 'tsyringe'
 
-import { IUserRepo, TokenType, UserNotFoundError, UserToken } from '../../domain'
+import { IUserRepo, TokenType, UserNotFoundError, UserToken } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
 import { getAppBaseUrl, getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'

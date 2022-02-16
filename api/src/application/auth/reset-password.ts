@@ -2,12 +2,12 @@ import { Expose } from 'class-transformer'
 import { IsNotEmpty } from 'class-validator'
 import { inject, singleton } from 'tsyringe'
 
-import { ExpiredTokenError, PasswordIsEqualError } from '.'
-import { IUserRepo, IsPassword, TokenType } from '../../domain'
+import { ExpiredTokenError } from '../../domain/auth'
+import { TokenNotFoundError } from '../../domain/auth/auth.errors'
+import { IUserRepo, IsPassword, TokenType } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
 import { getAppBaseUrl, getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
-import { TokenNotFoundError } from './auth.errors'
 
 class ResetPasswordInput {
   @Expose() @IsNotEmpty()
@@ -41,14 +41,12 @@ export class ResetPassword implements IApplicationService {
 
     if (userToken.isExpired()) {
       await this.userRepo.deleteUserToken(userToken)
-      throw new ExpiredTokenError('Reset password token expirado!')
+      throw new ExpiredTokenError('Recover password token expirado!')
     }
 
     const user = userToken.getUser()
-    const passwordIsEqual = await user.passwordIsEquals(password)
-    if (passwordIsEqual) {
-      throw new PasswordIsEqualError()
-    }
+
+    await user.passwordIsDiffOrFail(password)
 
     await user.setAndHashPassword(password)
     await this.userRepo.save(user)

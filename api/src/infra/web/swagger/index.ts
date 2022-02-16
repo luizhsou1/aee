@@ -3,7 +3,7 @@ import path from 'path'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi, { SwaggerUiOptions } from 'swagger-ui-express'
 
-import { web } from '../../config'
+import { getServerBaseUrl } from '../../../shared/utils'
 
 const TITLE = 'AEE REST API'
 
@@ -14,7 +14,7 @@ const swaggerOpts: swaggerJSDoc.Options = {
       title: TITLE,
       version: 'version'
     },
-    servers: [{ url: `${web.serverBaseUrl}/api` }],
+    servers: [{ url: `${getServerBaseUrl()}/api` }],
     components: {
       securitySchemes: {
         bearerAuth: {

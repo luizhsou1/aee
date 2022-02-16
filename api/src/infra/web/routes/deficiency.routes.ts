@@ -7,7 +7,7 @@ import {
   GetDeficiencyById,
   UpdateDeficiencyById
 } from '../../../application/deficiency'
-import { IDeficiencyRepo } from '../../../domain'
+import { IDeficiencyRepo } from '../../../domain/deficiency'
 import { pagination } from '../middlewares'
 import { isAtLeastCoordinator } from '../middlewares/auth.middleware'
 

@@ -1,6 +1,6 @@
 import { inject, singleton } from 'tsyringe'
 
-import { User, IUserRepo } from '../../domain'
+import { User, IUserRepo } from '../../domain/user'
 import { IApplicationService } from '../application.service'
 
 @singleton()
@@ -14,7 +14,7 @@ export class CreateUser implements IApplicationService {
   * @throws ValidationError
   * @throws UserEmailAlreadyExistsError
   */
-  async execute (data: object): Promise<User> {
+  async execute (data: Record<string, any>): Promise<User> {
     const user = await User.create(data)
 
     await user.hashPassword()

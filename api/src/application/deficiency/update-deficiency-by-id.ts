@@ -1,6 +1,6 @@
 import { inject, singleton } from 'tsyringe'
 
-import { Deficiency, DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain'
+import { Deficiency, DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain/deficiency'
 import { isIdOrFail } from '../../domain/validations'
 import { IApplicationService } from '../application.service'
 
@@ -15,7 +15,7 @@ export class UpdateDeficiencyById implements IApplicationService {
    * @throws ValidationError
    * @throws DeficiencyNotFoundError
    */
-  async execute (id: number, data: object): Promise<Deficiency> {
+  async execute (id: number, data: Record<string, any>): Promise<Deficiency> {
     isIdOrFail(id)
 
     const deficiency = await Deficiency.create({ ...data, id })

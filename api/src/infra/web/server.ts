@@ -1,27 +1,13 @@
-import cors from 'cors'
-import express from 'express'
-import path from 'path'
-
-import { getEnv } from '../../shared/utils'
-import { web } from '../config'
-import errorHandler from './error-handler'
-import routes from './routes'
-import swagger from './swagger'
+import { getEnv, getPort } from '../../shared/utils'
+import { setupApp } from './app'
 
 function start (): void {
-  const app = express()
+  const app = setupApp()
 
-  app.use(express.json())
-  app.use(cors())
+  const port = getPort()
+  console.log(port)
 
-  app.use('/images', express.static(path.join(__dirname, '..', '..', '..', 'public', 'images')))
-
-  swagger.setup(app)
-  routes.setup(app)
-
-  errorHandler.setup(app)
-
-  app.listen(web.port, () => console.log(`Server is running on port ${web.port} | Env: ${getEnv()}`))
+  app.listen(port, () => console.log(`Server is running on port ${port} | Env: ${getEnv()}`))
 }
 
 export default { start }

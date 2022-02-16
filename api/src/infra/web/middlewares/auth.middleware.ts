@@ -2,9 +2,9 @@ import { isEmpty } from 'class-validator'
 import { NextFunction, Request, Response } from 'express'
 import { container } from 'tsyringe'
 
-import { EnsureAuth } from '../../../application/auth'
-import { UserRole } from '../../../domain'
+import { EnsureAuth } from '../../../domain/auth'
 import { ValidationError } from '../../../domain/errors'
+import { UserRole } from '../../../domain/user'
 
 export const auth = (role: UserRole) => async (req: Request, res: Response, next: NextFunction) => {
   try {

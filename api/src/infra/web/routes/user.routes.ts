@@ -56,7 +56,7 @@ export const usersRoutes = Router()
 *     properties:
 *       id:
 *         type: integer
-*         example: id
+*         example: 1
 *       email:
 *         type: string
 *         example: maria.silva@mail.com

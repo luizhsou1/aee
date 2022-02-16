@@ -4,6 +4,7 @@ import { IsEmail, IsEnum, IsNotEmpty, MaxLength } from 'class-validator'
 import { Column, Entity } from 'typeorm'
 
 import { getInstanceOf } from '../../shared/utils'
+import { PasswordIsEqualError } from '../auth'
 import { DomainEntity } from '../entity'
 import { IValidateOptions, validateOrFail } from '../validations'
 import { IsPassword } from './is-password.decorator'
@@ -50,7 +51,7 @@ export class User extends DomainEntity {
     delete this.password
   }
 
-  static async create (data: object, options?: IValidateOptions): Promise<User> {
+  static async create (data: Record<string, any>, options?: IValidateOptions): Promise<User> {
     const user = getInstanceOf(User, data)
     await validateOrFail(user, options)
     return user
@@ -67,7 +68,17 @@ export class User extends DomainEntity {
     await this.hashPassword()
   }
 
-  async passwordIsEquals (password: string): Promise<boolean> {
+  /**
+   * @throws PasswordIsEqualError
+   */
+  async passwordIsDiffOrFail (password: string): Promise<void> {
+    const passwordIsEqual = await this.passwordIsEqual(password)
+    if (passwordIsEqual) {
+      throw new PasswordIsEqualError()
+    }
+  }
+
+  async passwordIsEqual (password: string): Promise<boolean> {
     if (!this.password) {
       throw new Error('Attribute \'password\' cannot be empty in invocation of this method')
     }

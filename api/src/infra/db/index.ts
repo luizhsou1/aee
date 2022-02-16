@@ -33,3 +33,11 @@ export async function connectToDatabase (): Promise<void> {
     process.exit(1)
   }
 }
+
+export async function closeConnectionWithDatabase (): Promise<void> {
+  await connection.close()
+}
+
+export async function dropDatabase (): Promise<void> {
+  await connection.dropDatabase()
+}

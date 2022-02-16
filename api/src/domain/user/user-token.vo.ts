@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer'
 import crypto from 'crypto'
 import { Column, CreateDateColumn, Entity, ManyToOne } from 'typeorm'
 
-import { getDaysToExpireRecoverPasswordToken, getDaysToExpireRefreshToken } from '../../shared/utils'
+import { addDaysInDate, getDaysToExpireRecoverPasswordToken, getDaysToExpireRefreshToken } from '../../shared/utils'
 import { User } from './user.entity'
 
 export enum TokenType {
@@ -56,7 +56,7 @@ export class UserToken {
 
   static create (user: User, type: TokenType) {
     const expirationDate = new Date()
-    expirationDate.setDate(expirationDate.getDate() + UserToken.DAYS_TO_EXPIRE_REFRESH_TOKEN)
+    addDaysInDate(expirationDate, UserToken.DAYS_TO_EXPIRE_REFRESH_TOKEN)
     return new UserToken(user, type, expirationDate)
   }
 

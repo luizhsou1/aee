@@ -1,7 +1,7 @@
 import { FindConditions, getRepository, Raw } from 'typeorm'
 
-import { Deficiency, IDeficiencyQueryOptions, IDeficiencyRepo } from '../../../domain'
 import { IPaginationOptions, Paginated } from '../../../domain/common'
+import { Deficiency, IDeficiencyQueryOptions, IDeficiencyRepo } from '../../../domain/deficiency'
 
 export class DeficiencyRepo implements IDeficiencyRepo {
   constructor (private readonly repo = getRepository(Deficiency)) {}

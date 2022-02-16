@@ -55,7 +55,7 @@
       "error",
       {
         "devDependencies": [
-          "**/*.spec.js"
+          "**/?(*.)+(spec|test).[tj]s?(x)"
         ]
       }
     ]

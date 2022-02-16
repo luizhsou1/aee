@@ -1,12 +1,18 @@
 import { getRepository } from 'typeorm'
 
-import { User, IUserRepo, UserEmailAlreadyExistsError, UserToken, IFindUserTokenOptions } from '../../../domain'
+import { User, IUserRepo, UserEmailAlreadyExistsError, UserToken, IFindUserTokenOptions } from '../../../domain/user'
 
 export class UserRepo implements IUserRepo {
   constructor (
     private readonly repo = getRepository(User),
     private readonly userTokenRepo = getRepository(UserToken)
   ) {}
+
+  async exists (id: number): Promise<boolean> {
+    // @ts-ignore
+    const entity = await this.repo.findOne(id, { select: ['id'] })
+    return !!entity
+  }
 
   async save (user: User): Promise<User> {
     try {
@@ -16,6 +22,13 @@ export class UserRepo implements IUserRepo {
         throw new UserEmailAlreadyExistsError(user.getEmail())
       }
       throw error
+    }
+  }
+
+  async findById (id: number): Promise<User | undefined> {
+    const entity = await this.repo.findOne(id)
+    if (entity) {
+      return entity
     }
   }
 
