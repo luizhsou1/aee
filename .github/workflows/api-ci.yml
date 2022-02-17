@@ -13,62 +13,64 @@ on:
       - api/**
 
 jobs:
-  check-application:
-    name: 'Check Application'
+  linting:
+    name: 'Linting'
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: api
-
     steps:
-      - run: echo foi
-      
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
           node-version: '16.3.x'
+      - run: npm ci
+      - run: npm run lint
 
-      - name: clone env file
-        run: cp .env.sample .env
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Check linting
-        run: npm run lint
-
-      - name: Preparing environment for test
-        run: docker-compose up -d pg_aee_test
-
-      - name: Check tests
-        run: npm run test:cov
-
-      - name: Send coverage to Coveralls
+  testing:
+    name: 'Testing'
+    runs-on: ubuntu-latest
+    needs: linting
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.3.x'
+      - run: cp .env.sample .env
+      - run: npm ci
+      - run: docker-compose up -d pg_aee_test
+      - run: npm run test:cov
+      - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./api/coverage/lcov.info
+          base-path: api
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - run: sudo chown -R $USER ./.docker
 
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: ./api
-          push: true
-          tags: luizhsou1/aee:latest
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v1
+
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v1
+
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # - name: Build and push
+      #   id: docker_build
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: ./api
+      #     push: true
+      #     tags: luizhsou1/aee:latest
+
+
+    

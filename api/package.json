@@ -24,7 +24,7 @@
     "migration:up": "npm run typeorm -- migration:run",
     "migration:down": "npm run typeorm -- migration:revert",
     "schema:drop": "npm run typeorm -- schema:drop",
-    "test": "NODE_ENV=test jest",
+    "test": "NODE_ENV=test jest --runInBand",
     "test:cov": "npm test -- --coverage"
   },
   "dependencies": {
