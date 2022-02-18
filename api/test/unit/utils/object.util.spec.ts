@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Expose } from 'class-transformer'
 
 import { getInstanceOf, getInstancesOf } from '../../../src/shared/utils'
