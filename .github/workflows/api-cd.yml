@@ -1,0 +1,41 @@
+name: Continuos Deployment API
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+    paths:
+      - api/**
+
+jobs:
+  build-image:
+    name: 'Build Image'
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v2
+        if: github.event.pull_request.merged
+      - run: cp .env.sample .env
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./api
+          push: true
+          tags: luizhsou1/aee:latest
+
+
+    
