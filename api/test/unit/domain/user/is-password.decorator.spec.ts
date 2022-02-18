@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Expose } from 'class-transformer'
 
 import { ValidationError } from '../../../../src/domain/errors'

@@ -9,6 +9,29 @@ on:
       - api/**
 
 jobs:
+  testing:
+    name: 'Testing'
+    runs-on: ubuntu-latest
+    needs: linting
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.3.x'
+      - run: cp .env.sample .env
+      - run: npm ci
+      - run: docker-compose up -d pg_aee_test
+      - run: npm run test:cov
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./api/coverage/lcov.info
+          base-path: api
+
   build-image:
     name: 'Build Image'
     runs-on: ubuntu-latest
