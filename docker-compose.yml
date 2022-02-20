@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  aee_pg:
+    container_name: aee_pg
+    image: postgres:14.2-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: aee
+    tty: true
+    networks:
+      - network
+    healthcheck:
+      test: [
+        "CMD",
+        "pg_isready",
+        "-U",
+        "postgres",
+      ]
+      interval: 3s
+      timeout: 5s
+      retries: 15
+    restart: on-failure
+  
+  aee_api:
+    container_name: aee_api
+    image: luizhsou1/aee-api
+    environment:
+      NODE_ENV: dev
+      DB_HOST: aee_pg
+      DB_PORT: 5432
+    ports:
+      - 4000:4000
+    tty: true
+    networks:
+      - network
+    restart: always
+
+  aee_app:
+    container_name: aee_app
+    image: luizhsou1/aee-app
+    ports:
+      - 4040:80
+    tty: true
+    networks:
+      - network
+    restart: always
+
+networks:
+  network:
+    driver: bridge

@@ -15,7 +15,8 @@
   "scripts": {
     "start": "LOGGING_LEVEL=info node dist/index.js",
     "dev": "NODE_ENV=dev ts-node-dev --inspect --transpile-only --ignore-watch node_modules --respawn src/index.ts",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc && npm run cp:email-templates",
+    "cp:email-templates": "cpx './src/application/providers/email/templates/**' 'dist/application/providers/email/templates'",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
     "typeorm": "./node_modules/.bin/ts-node --transpile-only ./node_modules/.bin/typeorm",
@@ -63,6 +64,7 @@
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "cpx": "^1.5.0",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-import-resolver-typescript": "^2.5.0",
