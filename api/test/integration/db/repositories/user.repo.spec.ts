@@ -1,7 +1,7 @@
 import { getRepository, Repository } from 'typeorm'
 
 import { TokenType, User, UserEmailAlreadyExistsError, UserRole, UserToken } from '../../../../src/domain/user'
-import { closeConnectionWithDatabase, connectToDatabase, dropDatabase } from '../../../../src/infra/db'
+import { closeConnectionWithDatabase, connectToDatabase } from '../../../../src/infra/db'
 import { UserRepo } from '../../../../src/infra/db/repositories'
 import { getInstanceOf } from '../../../../src/shared/utils'
 
@@ -10,7 +10,7 @@ describe('UserRepo | Repository', () => {
   let typeormRepo: Repository<User>
 
   const initialConfigDb = async () => {
-    await connectToDatabase()
+    await connectToDatabase({ dropDatabase: true })
 
     typeormRepo = getRepository(User)
 
@@ -43,7 +43,6 @@ describe('UserRepo | Repository', () => {
   })
 
   afterAll(async () => {
-    await dropDatabase()
     await closeConnectionWithDatabase()
   })
 

@@ -1,7 +1,7 @@
 import { getRepository, Repository } from 'typeorm'
 
 import { Deficiency } from '../../../../src/domain/deficiency'
-import { closeConnectionWithDatabase, connectToDatabase, dropDatabase } from '../../../../src/infra/db'
+import { closeConnectionWithDatabase, connectToDatabase } from '../../../../src/infra/db'
 import { DeficiencyRepo } from '../../../../src/infra/db/repositories'
 import { getInstanceOf } from '../../../../src/shared/utils'
 
@@ -10,7 +10,7 @@ describe('DeficiencyRepo | Repository', () => {
   let typeormRepo: Repository<Deficiency>
 
   const initialConfigDb = async () => {
-    await connectToDatabase()
+    await connectToDatabase({ dropDatabase: true })
 
     typeormRepo = getRepository(Deficiency)
 
@@ -26,7 +26,6 @@ describe('DeficiencyRepo | Repository', () => {
   })
 
   afterAll(async () => {
-    await dropDatabase()
     await closeConnectionWithDatabase()
   })
 

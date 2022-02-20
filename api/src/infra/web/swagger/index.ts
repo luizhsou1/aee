@@ -3,6 +3,7 @@ import path from 'path'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi, { SwaggerUiOptions } from 'swagger-ui-express'
 
+import { Logger } from '../../../shared/logger'
 import { getServerBaseUrl } from '../../../shared/utils'
 
 const TITLE = 'AEE REST API'
@@ -14,7 +15,7 @@ const swaggerOpts: swaggerJSDoc.Options = {
       title: TITLE,
       version: 'version'
     },
-    servers: [{ url: `${getServerBaseUrl()}/api` }],
+    servers: [{ url: getServerBaseUrl() }],
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -43,6 +44,7 @@ function setup (app: Application) {
     res.setHeader('Content-Type', 'application/json')
     res.send(openapiSpec)
   })
+  new Logger('Swagger').debug('successfully configured')
 }
 
 export default { setup }

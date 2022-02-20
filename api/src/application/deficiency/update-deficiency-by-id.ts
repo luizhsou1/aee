@@ -2,10 +2,13 @@ import { inject, singleton } from 'tsyringe'
 
 import { Deficiency, DeficiencyNotFoundError, IDeficiencyRepo } from '../../domain/deficiency'
 import { isIdOrFail } from '../../domain/validations'
+import { Logger } from '../../shared/logger'
 import { IApplicationService } from '../application.service'
 
 @singleton()
 export class UpdateDeficiencyById implements IApplicationService {
+  private readonly logger = new Logger(UpdateDeficiencyById.name)
+
   constructor (
     @inject('IDeficiencyRepo')
     private readonly deficiencyRepo: IDeficiencyRepo
@@ -25,6 +28,10 @@ export class UpdateDeficiencyById implements IApplicationService {
       throw new DeficiencyNotFoundError()
     }
 
-    return this.deficiencyRepo.save(deficiency)
+    const updatedDeficiency = this.deficiencyRepo.save(deficiency)
+
+    this.logger.info(`Deficiency with id ${id} updated ${updatedDeficiency}`)
+
+    return updatedDeficiency
   }
 }

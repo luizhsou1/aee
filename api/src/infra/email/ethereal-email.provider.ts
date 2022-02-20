@@ -4,11 +4,15 @@ import nodemailer, { Transporter } from 'nodemailer'
 import path from 'path'
 
 import { IEmailProvider } from '../../application/providers'
+import { Logger } from '../../shared/logger'
 import { DataObject } from '../../shared/types'
 import { getServerBaseUrl } from '../../shared/utils'
 
 export class EtherealEmailProvider implements IEmailProvider {
+  private readonly logger = new Logger(EtherealEmailProvider.name)
+
   private client?: Transporter
+
   constructor () {
     nodemailer.createTestAccount().then(async account => {
       const transporter = nodemailer.createTransport({
@@ -24,14 +28,14 @@ export class EtherealEmailProvider implements IEmailProvider {
       const clientOk = await transporter.verify()
       if (clientOk) {
         this.client = transporter
-        console.log('Client nodemailer is registered')
+        this.logger.debug('Client nodemailer is registered')
       }
-    }).catch((err) => console.error(`Error registering 'nodemailer' | ${err}`))
+    }).catch((err) => this.logger.error(`Error registering 'nodemailer' | ${err}`))
   }
 
   async send (to: string, subject: string, template: string, variables: DataObject = {}): Promise<void> {
     if (!this.client) {
-      console.warn('Client nodemailer is not registered yet')
+      this.logger.warn('Client nodemailer is not registered yet')
       return
     }
 
@@ -51,7 +55,6 @@ export class EtherealEmailProvider implements IEmailProvider {
       html: templateHtml
     })
 
-    console.log(`Message sent: ${info.messageId}`)
-    console.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`)
+    this.logger.info(`simulated sending email | URL access to preview: ${nodemailer.getTestMessageUrl(info)} | messageId: ${info.messageId}`)
   }
 }

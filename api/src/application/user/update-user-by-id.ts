@@ -2,10 +2,13 @@ import { inject, singleton } from 'tsyringe'
 
 import { User, IUserRepo, UserNotFoundError } from '../../domain/user'
 import { isIdOrFail } from '../../domain/validations'
+import { Logger } from '../../shared/logger'
 import { IApplicationService } from '../application.service'
 
 @singleton()
 export class UpdateUserById implements IApplicationService {
+  private readonly logger = new Logger(UpdateUserById.name)
+
   constructor (
     @inject('IUserRepo')
     private readonly userRepo: IUserRepo
@@ -29,9 +32,11 @@ export class UpdateUserById implements IApplicationService {
       await userToSave.hashPassword()
     }
 
-    const userSaved = await this.userRepo.save(userToSave)
-    userSaved.clearPassword()
+    const savedUser = await this.userRepo.save(userToSave)
+    savedUser.clearPassword()
 
-    return userSaved
+    this.logger.info(`User with id ${id} updated ${JSON.stringify(savedUser)}`)
+
+    return savedUser
   }
 }

@@ -3,7 +3,7 @@ import request from 'supertest'
 import { getRepository, Repository } from 'typeorm'
 
 import { TokenType, User, UserRole, UserToken } from '../../src/domain/user'
-import { closeConnectionWithDatabase, connectToDatabase, dropDatabase } from '../../src/infra/db'
+import { closeConnectionWithDatabase, connectToDatabase } from '../../src/infra/db'
 import { setupApp } from '../../src/infra/web/app'
 import { getInstanceOf } from '../../src/shared/utils'
 
@@ -13,7 +13,7 @@ describe('Auth Routes', () => {
   let typeormRepoUserToken: Repository<UserToken>
 
   const initialConfigDb = async () => {
-    await connectToDatabase()
+    await connectToDatabase({ dropDatabase: true })
 
     typeormRepoUser = getRepository(User)
     typeormRepoUserToken = getRepository(UserToken)
@@ -49,7 +49,6 @@ describe('Auth Routes', () => {
   })
 
   afterAll(async () => {
-    await dropDatabase()
     await closeConnectionWithDatabase()
   })
 
@@ -58,7 +57,7 @@ describe('Auth Routes', () => {
   describe('POST /auth/signin', () => {
     test('Should return 200 on signin', async () => {
       await request(app)
-        .post('/api/auth/signin')
+        .post('/auth/signin')
         .send({
           email: 'admin@mail.com',
           password: 'projetoaee2022'
@@ -84,7 +83,7 @@ describe('Auth Routes', () => {
 
     test('Should return 401 on signin', async () => {
       await request(app)
-        .post('/api/auth/signin')
+        .post('/auth/signin')
         .send({
           email: 'admin@mail.com',
           password: '123456'
@@ -92,7 +91,7 @@ describe('Auth Routes', () => {
         .expect(401)
 
       await request(app)
-        .post('/api/auth/signin')
+        .post('/auth/signin')
         .send({
           email: 'not_exists@mail.com',
           password: 'projetoaee2022'
@@ -104,7 +103,7 @@ describe('Auth Routes', () => {
   describe('POST /auth/refresh-token', () => {
     test('Should return 200 on refresh token', async () => {
       await request(app)
-        .post('/api/auth/refresh-token')
+        .post('/auth/refresh-token')
         .send({ refreshToken })
         .expect(({ status, body }) => {
           expect(status).toBe(200)
@@ -125,7 +124,7 @@ describe('Auth Routes', () => {
 
     test('Should return 404 on refresh token', async () => {
       await request(app)
-        .post('/api/auth/refresh-token')
+        .post('/auth/refresh-token')
         .send({ refreshToken })
         .expect(({ status, body }) => {
           expect(status).toBe(404)
@@ -137,7 +136,7 @@ describe('Auth Routes', () => {
     describe('GET /auth/forgot-password', () => {
       test('Should return 204 on forgot password', async () => {
         await request(app)
-          .get('/api/auth/forgot-password/admin@mail.com')
+          .get('/auth/forgot-password/admin@mail.com')
           .expect(204)
           // @ts-ignore
         const userToken = await typeormRepoUserToken.findOne({ type: TokenType.RECOVER_PASSWORD_TOKEN })
@@ -150,12 +149,12 @@ describe('Auth Routes', () => {
     describe('POST /auth/reset-password', () => {
       test('Should return 204 on reset password', async () => {
         await request(app)
-          .post(`/api/auth/reset-password?token=${tokenRecoverPassword}`)
+          .post(`/auth/reset-password?token=${tokenRecoverPassword}`)
           .send({ password: '2022projetoaee' })
           .expect(204)
 
         await request(app)
-          .post('/api/auth/signin')
+          .post('/auth/signin')
           .send({
             email: 'admin@mail.com',
             password: '2022projetoaee'
@@ -167,13 +166,13 @@ describe('Auth Routes', () => {
     describe('POST /auth/change-password', () => {
       test('Should return 204 on change password', async () => {
         await request(app)
-          .post('/api/auth/change-password')
+          .post('/auth/change-password')
           .set('Authorization', `Bearer ${accessToken}`)
           .send({ password: 'projetoaee2022' })
           .expect(204)
 
         await request(app)
-          .post('/api/auth/signin')
+          .post('/auth/signin')
           .send({
             email: 'admin@mail.com',
             password: 'projetoaee2022'

@@ -42,6 +42,7 @@ export default {
     '/src/infra/web/',
     '/src/shared/utils/env.util.ts',
     '/src/shared/types/',
+    '/src/shared/logger/',
     '.errors.ts',
     'index.ts'
   ],

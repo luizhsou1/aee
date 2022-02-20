@@ -1,6 +1,7 @@
 import { Application, NextFunction, Request, Response } from 'express'
 
 import { DomainError, ValidationError } from '../../domain/errors'
+import { Logger } from '../../shared/logger'
 import { isProd } from '../../shared/utils'
 
 interface IError {
@@ -12,7 +13,10 @@ interface IError {
 }
 
 function setup (app: Application) {
+  const logger = new Logger('ErrorHandler')
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    logger.error(err)
+
     if (isProd()) {
       delete err.stack
     }
@@ -35,6 +39,7 @@ function setup (app: Application) {
     }
     return res.status(500).json(error)
   })
+  logger.debug('successfully configured')
 }
 
 export default { setup }

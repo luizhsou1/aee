@@ -1,11 +1,16 @@
 import path from 'path'
 import { Connection, ConnectionOptions, createConnection } from 'typeorm'
 
+import { Logger } from '../../shared/logger'
+import { isProd } from '../../shared/utils'
+
 const options: ConnectionOptions = require('../../../ormconfig')
+
+const logger = new Logger('Database')
 
 export let connection: Connection
 
-export async function connectToDatabase (): Promise<void> {
+export async function connectToDatabase ({ dropDatabase = false } = {}): Promise<void> {
   try {
     connection = await createConnection({
       ...options,
@@ -18,26 +23,26 @@ export async function connectToDatabase (): Promise<void> {
     })
 
     if (!connection.isConnected) {
-      console.warn('Failed to connect to the database')
+      logger.warn('Failed to connect to the database')
       process.exit(1)
     }
 
-    console.info('Connected to Database')
+    if (dropDatabase && !isProd()) {
+      await connection.dropDatabase()
+    }
+
+    logger.debug('Connected to Database')
 
     const migrations = await connection.runMigrations()
     if (migrations.length) {
-      console.info(`Performed these migrations: ${JSON.stringify(migrations)}`)
+      logger.info(`Performed these migrations: ${JSON.stringify(migrations)}`)
     }
   } catch (err: any) {
-    console.error(`Connection to Database failed: ${JSON.stringify(err)}`, err.stack)
+    logger.error(`Connection to Database failed: ${JSON.stringify(err)}`, err.stack)
     process.exit(1)
   }
 }
 
 export async function closeConnectionWithDatabase (): Promise<void> {
   await connection.close()
-}
-
-export async function dropDatabase (): Promise<void> {
-  await connection.dropDatabase()
 }
