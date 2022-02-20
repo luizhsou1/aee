@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class InsertUserAdmin1645293080404 implements MigrationInterface {
-  private readonly email = 'admin@aee.com'
+  private readonly email = 'admin@projetoaee.com.br'
   public async up (qr: QueryRunner): Promise<void> {
     // Deve ser alterado em produção a senha do admin obviamente, é só para facilitar e ter um primeiro usuário, que acessa todas as rotas privadas
     // porque se não, nem daria para criar outros usuários via aplicação, teria o trabalho de fazer insert no banco
