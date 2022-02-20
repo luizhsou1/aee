@@ -1,4 +1,4 @@
-name: Continuos Deployment API
+name: Continuos Deployment APP
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - api/**
+      - app/**
 
 jobs:
   build-image:
@@ -15,7 +15,7 @@ jobs:
     if: github.event.pull_request.merged
     defaults:
       run:
-        working-directory: api
+        working-directory: app
     steps:
       - uses: actions/checkout@v2
         if: github.event.pull_request.merged
@@ -32,9 +32,9 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ./api
+          context: ./app
           push: true
-          tags: luizhsou1/aee-api:latest
+          tags: luizhsou1/aee-app:latest
 
 
     
