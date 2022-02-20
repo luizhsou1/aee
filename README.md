@@ -32,5 +32,5 @@ docker-compose up
 ## 😃 Acesse o sistema como admin:
 
 1. Entre em http://localhost:4040
-2. Informe o usuário: `admin@aee.com`
+2. Informe o usuário: `admin@projetoaee.com.br`
 3. Informe a senha: `projetoaee2022`
