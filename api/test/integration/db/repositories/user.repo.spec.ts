@@ -69,7 +69,7 @@ describe('UserRepo | Repository', () => {
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Some',
         email: 'some@mail.com',
         password: 'some_hash_password',
@@ -100,7 +100,7 @@ describe('UserRepo | Repository', () => {
 
     it('should update user in database', async () => {
       const user = getInstanceOf(User, {
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',
@@ -111,7 +111,7 @@ describe('UserRepo | Repository', () => {
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',
@@ -123,11 +123,11 @@ describe('UserRepo | Repository', () => {
 
   describe('findById', () => {
     it('should return "user" if exists user in database', async () => {
-      const result = await repo.findById(4)
+      const result = await repo.findById(5)
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',
@@ -148,7 +148,7 @@ describe('UserRepo | Repository', () => {
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',

@@ -2,42 +2,18 @@ import { Express } from 'express'
 import request from 'supertest'
 import { getRepository, Repository } from 'typeorm'
 
-import { TokenType, User, UserRole, UserToken } from '../../src/domain/user'
+import { TokenType, UserToken } from '../../src/domain/user'
 import { closeConnectionWithDatabase, connectToDatabase } from '../../src/infra/db'
 import { setupApp } from '../../src/infra/web/app'
-import { getInstanceOf } from '../../src/shared/utils'
 
 describe('Auth Routes', () => {
   let app: Express
-  let typeormRepoUser: Repository<User>
   let typeormRepoUserToken: Repository<UserToken>
 
   const initialConfigDb = async () => {
     await connectToDatabase({ dropDatabase: true })
 
-    typeormRepoUser = getRepository(User)
     typeormRepoUserToken = getRepository(UserToken)
-
-    const userAmin = getInstanceOf(User, {
-      name: 'Admin',
-      email: 'admin@mail.com',
-      password: '$2b$08$qP9QkoZ7z2rJxr6i5/C9o.yl02I0LFzmSg72jEQSFgCiCbB90T7hW', // hash password: projetoaee2022
-      role: UserRole.ADMIN
-    })
-    const userCoordinator = getInstanceOf(User, {
-      name: 'Coordinator',
-      email: 'coordinator@mail.com',
-      password: '$2b$08$qP9QkoZ7z2rJxr6i5/C9o.yl02I0LFzmSg72jEQSFgCiCbB90T7hW', // hash password: projetoaee2022
-      role: UserRole.COORDINATOR
-    })
-    const userTeacher = getInstanceOf(User, {
-      name: 'Teacher',
-      email: 'teacher@mail.com',
-      password: '$2b$08$qP9QkoZ7z2rJxr6i5/C9o.yl02I0LFzmSg72jEQSFgCiCbB90T7hW', // hash password: projetoaee2022
-      role: UserRole.TEACHER
-    })
-
-    await typeormRepoUser.save([userAmin, userCoordinator, userTeacher])
   }
 
   beforeAll(async () => {
@@ -59,7 +35,7 @@ describe('Auth Routes', () => {
       await request(app)
         .post('/auth/signin')
         .send({
-          email: 'admin@mail.com',
+          email: 'admin@projetoaee.com.br',
           password: 'projetoaee2022'
         })
         .expect(({ status, body }) => {
@@ -67,8 +43,8 @@ describe('Auth Routes', () => {
           expect(body).toEqual({
             user: {
               id: 1,
-              email: 'admin@mail.com',
-              name: 'Admin',
+              email: 'admin@projetoaee.com.br',
+              name: 'AEE Admin',
               role: 'ADMIN',
               createdAt: expect.any(String),
               updatedAt: expect.any(String)
@@ -85,7 +61,7 @@ describe('Auth Routes', () => {
       await request(app)
         .post('/auth/signin')
         .send({
-          email: 'admin@mail.com',
+          email: 'admin@projetoaee.com.br',
           password: '123456'
         })
         .expect(401)
@@ -110,8 +86,8 @@ describe('Auth Routes', () => {
           expect(body).toEqual({
             user: {
               id: 1,
-              email: 'admin@mail.com',
-              name: 'Admin',
+              email: 'admin@projetoaee.com.br',
+              name: 'AEE Admin',
               role: 'ADMIN',
               createdAt: expect.any(String),
               updatedAt: expect.any(String)
@@ -136,7 +112,7 @@ describe('Auth Routes', () => {
     describe('GET /auth/forgot-password', () => {
       test('Should return 204 on forgot password', async () => {
         await request(app)
-          .get('/auth/forgot-password/admin@mail.com')
+          .get('/auth/forgot-password/admin@projetoaee.com.br')
           .expect(204)
           // @ts-ignore
         const userToken = await typeormRepoUserToken.findOne({ type: TokenType.RECOVER_PASSWORD_TOKEN })
@@ -156,7 +132,7 @@ describe('Auth Routes', () => {
         await request(app)
           .post('/auth/signin')
           .send({
-            email: 'admin@mail.com',
+            email: 'admin@projetoaee.com.br',
             password: '2022projetoaee'
           })
           .expect(200)
@@ -174,7 +150,7 @@ describe('Auth Routes', () => {
         await request(app)
           .post('/auth/signin')
           .send({
-            email: 'admin@mail.com',
+            email: 'admin@projetoaee.com.br',
             password: 'projetoaee2022'
           })
           .expect(200)
