@@ -34,3 +34,14 @@ docker-compose up
 1. Entre em http://localhost:4040
 2. Informe o usuário: `admin@projetoaee.com.br`
 3. Informe a senha: `projetoaee2022`
+
+## 📄 Documentação da API:
+
+Entre em http://localhost:4000/docs
+
+> **Observação:**  
+> 
+> Este compose não contém configuração de serviço de e-mail real, logo em cenários que em produção enviaria um e-mail, apenas simulo este envio utilizando a ferramenta do [etheral](https://ethereal.email/). Assim sendo nos fluxos de `esqueceu a senha` deve observar o log, que nele constará a mensagem contendo um link para este e-mail simulado.  
+> A imagem abaixo ilustra bem este log:  
+> 
+> ![Imagem de log da simulação de envio de e-mail](./simulated-send-email-log.png)
