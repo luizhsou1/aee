@@ -7,6 +7,7 @@ import { GenerateAccessAndRefreshToken, IGenerateAccessAndRefreshTokenReturn } f
 import { EmailOrPasswordIncorrectError } from '../../domain/auth/auth.errors'
 import { IUserRepo, User } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
+import { Logger } from '../../shared/logger'
 import { getInstanceOf, getJwtExpiresIn, getJwtSecret } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
 
@@ -19,6 +20,8 @@ class SignInInput {
 }
 @singleton()
 export class SignIn implements IApplicationService {
+  private readonly logger = new Logger(SignIn.name)
+
   private static readonly JWT_SECRET = getJwtSecret()
   private static readonly JWT_EXPIRES_IN = getJwtExpiresIn()
 
@@ -46,6 +49,8 @@ export class SignIn implements IApplicationService {
     }
 
     const tokens = await this.generateAccessAndRefreshToken.execute(user)
+
+    this.logger.debug(`Generate access tokens by signin for user with email '${email}' with successfully`)
 
     user.clearPassword()
 

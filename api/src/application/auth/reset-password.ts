@@ -6,7 +6,8 @@ import { ExpiredTokenError } from '../../domain/auth'
 import { TokenNotFoundError } from '../../domain/auth/auth.errors'
 import { IUserRepo, IsPassword, TokenType } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
-import { getAppBaseUrl, getInstanceOf } from '../../shared/utils'
+import { Logger } from '../../shared/logger'
+import { getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
 
 class ResetPasswordInput {
@@ -19,7 +20,7 @@ class ResetPasswordInput {
 
 @singleton()
 export class ResetPassword implements IApplicationService {
-  private readonly appBaseUrl = getAppBaseUrl()
+  private readonly logger = new Logger(ResetPassword.name)
 
   constructor (
     @inject('IUserRepo')
@@ -50,6 +51,8 @@ export class ResetPassword implements IApplicationService {
 
     await user.setAndHashPassword(password)
     await this.userRepo.save(user)
+
+    this.logger.info(`Reset password by token for user with email '${user.getEmail()}' with successfully`)
 
     await this.userRepo.deleteUserToken(userToken)
   }

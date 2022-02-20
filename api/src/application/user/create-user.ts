@@ -1,10 +1,13 @@
 import { inject, singleton } from 'tsyringe'
 
 import { User, IUserRepo } from '../../domain/user'
+import { Logger } from '../../shared/logger'
 import { IApplicationService } from '../application.service'
 
 @singleton()
 export class CreateUser implements IApplicationService {
+  private readonly logger = new Logger(CreateUser.name)
+
   constructor (
     @inject('IUserRepo')
     private readonly userRepo: IUserRepo
@@ -19,9 +22,11 @@ export class CreateUser implements IApplicationService {
 
     await user.hashPassword()
 
-    const userSaved = await this.userRepo.save(user)
-    userSaved.clearPassword()
+    const savedUser = await this.userRepo.save(user)
+    savedUser.clearPassword()
 
-    return userSaved
+    this.logger.info(`User created ${JSON.stringify(savedUser)}`)
+
+    return savedUser
   }
 }

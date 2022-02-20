@@ -3,7 +3,7 @@ version: '3.9'
 services:
   pg_aee:
     container_name: pg_aee
-    image: postgres:13.5-alpine
+    image: postgres:14.2-alpine
     environment:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_USER: ${DB_USER}
@@ -31,15 +31,13 @@ services:
 
   pg_aee_test:
     container_name: pg_aee_test
-    image: postgres:13.5-alpine
+    image: postgres:14.2-alpine
     environment:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     env_file:
       - .env
-    volumes:
-      - ./.docker/postgres-test:/var/lib/postgresql/data
     ports:
       - ${DB_PORT_TEST}:5432
     tty: true

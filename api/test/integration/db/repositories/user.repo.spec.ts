@@ -1,7 +1,7 @@
 import { getRepository, Repository } from 'typeorm'
 
 import { TokenType, User, UserEmailAlreadyExistsError, UserRole, UserToken } from '../../../../src/domain/user'
-import { closeConnectionWithDatabase, connectToDatabase, dropDatabase } from '../../../../src/infra/db'
+import { closeConnectionWithDatabase, connectToDatabase } from '../../../../src/infra/db'
 import { UserRepo } from '../../../../src/infra/db/repositories'
 import { getInstanceOf } from '../../../../src/shared/utils'
 
@@ -10,7 +10,7 @@ describe('UserRepo | Repository', () => {
   let typeormRepo: Repository<User>
 
   const initialConfigDb = async () => {
-    await connectToDatabase()
+    await connectToDatabase({ dropDatabase: true })
 
     typeormRepo = getRepository(User)
 
@@ -43,7 +43,6 @@ describe('UserRepo | Repository', () => {
   })
 
   afterAll(async () => {
-    await dropDatabase()
     await closeConnectionWithDatabase()
   })
 
@@ -70,7 +69,7 @@ describe('UserRepo | Repository', () => {
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Some',
         email: 'some@mail.com',
         password: 'some_hash_password',
@@ -101,7 +100,7 @@ describe('UserRepo | Repository', () => {
 
     it('should update user in database', async () => {
       const user = getInstanceOf(User, {
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',
@@ -112,7 +111,7 @@ describe('UserRepo | Repository', () => {
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',
@@ -124,11 +123,11 @@ describe('UserRepo | Repository', () => {
 
   describe('findById', () => {
     it('should return "user" if exists user in database', async () => {
-      const result = await repo.findById(4)
+      const result = await repo.findById(5)
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',
@@ -149,7 +148,7 @@ describe('UserRepo | Repository', () => {
 
       expect(result).toEqual(expect.any(User))
       expect(result).toMatchObject({
-        id: 4,
+        id: 5,
         name: 'Other',
         email: 'other@mail.com',
         password: 'other_hash_password',

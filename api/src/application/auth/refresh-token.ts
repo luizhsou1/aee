@@ -11,6 +11,7 @@ import {
 } from '../../domain/auth'
 import { IUserRepo, TokenType, User } from '../../domain/user'
 import { validateOrFail } from '../../domain/validations'
+import { Logger } from '../../shared/logger'
 import { getInstanceOf } from '../../shared/utils'
 import { IApplicationService } from '../application.service'
 
@@ -21,6 +22,8 @@ class RefreshTokenInput {
 
 @singleton()
 export class RefreshToken implements IApplicationService {
+  private readonly logger = new Logger(RefreshToken.name)
+
   constructor (
     @inject('IUserRepo')
     private readonly userRepo: IUserRepo,
@@ -45,12 +48,14 @@ export class RefreshToken implements IApplicationService {
       throw new ExpiredTokenError('Refresh token expirado!')
     }
 
-    const tokens = await this.generateAccessAndRefreshToken.execute(userRefreshToken.getUser())
-
-    await this.userRepo.deleteUserToken(userRefreshToken)
-
     const user = userRefreshToken.getUser()
     user.clearPassword()
+
+    const tokens = await this.generateAccessAndRefreshToken.execute(userRefreshToken.getUser())
+
+    this.logger.debug(`Generate access tokens by refresh for user with email '${user.getEmail()}' token with successfully`)
+
+    await this.userRepo.deleteUserToken(userRefreshToken)
 
     return { ...tokens, user }
   }

@@ -1,43 +1,26 @@
 ############################################
 ### API BUILD STAGE
 ############################################
-FROM node:16.13-alpine AS apibuild
-
-# Create api directory
-RUN mkdir -p /usr/src/api
-WORKDIR /usr/src/api
-
-# Install api dependencies
-COPY package.json package-lock.json /usr/src/api/
+FROM node:16.14-alpine AS build-stage
+WORKDIR /api
+COPY package*.json ./
 RUN npm ci
-
-# Build api
-COPY tsconfig.json ormconfig.js /usr/src/api/
-COPY src /usr/src/api/src
+COPY . .
 RUN npm run build
 
-# Install api production dependencies
+# Install only production dependencies
 RUN rm -rf node_modules && npm ci --production
 
 ############################################
 ### IMAGE BUILD STAGE
 ############################################
 FROM node:16.13-alpine
-
-# Create api directory
-RUN mkdir -p /usr/src/api
-WORKDIR /usr/src/api
-
-# Copy api dependencies
-COPY package.json /usr/src/api/
-COPY --from=apibuild /usr/src/api/node_modules /usr/src/api/node_modules
-
-# Bundle api source
-COPY --from=apibuild /usr/src/api/dist /usr/src/api/dist
+WORKDIR /api
+COPY --from=build-stage /api/node_modules ./node_modules
+COPY --from=build-stage /api/dist ./dist
+COPY public ./public
+COPY package.json ./
+COPY ormconfig.js ./
 COPY .env.sample .env
-COPY public /usr/src/api/public
-COPY ormconfig.js /usr/src/api/
-
-EXPOSE  3030
-
+EXPOSE  4000
 CMD [ "npm", "start" ]
