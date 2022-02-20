@@ -26,6 +26,9 @@ services:
   aee_api:
     container_name: aee_api
     image: luizhsou1/aee-api
+    depends_on:
+      aee_pg:
+        condition: service_healthy
     environment:
       NODE_ENV: dev
       DB_HOST: aee_pg
