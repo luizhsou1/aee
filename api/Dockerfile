@@ -16,6 +16,7 @@ RUN rm -rf node_modules && npm ci --production
 ############################################
 FROM node:16.13-alpine
 WORKDIR /api
+RUN apk --no-cache add curl
 COPY --from=build-stage /api/node_modules ./node_modules
 COPY --from=build-stage /api/dist ./dist
 COPY public ./public

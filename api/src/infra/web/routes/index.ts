@@ -19,6 +19,9 @@ function setup (app: Application) {
   routes.use('/deficiencies', deficienciesRoutes)
   logger.debug('/deficiencies successfully configured')
 
+  routes.get('/health-check', (req, res) => res.send())
+  logger.debug('/health-check successfully configured')
+
   app.use(routes)
 }
 
