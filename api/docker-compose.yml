@@ -24,10 +24,10 @@ services:
         "-U",
         "${DB_USER}",
       ]
-      interval: 3s
+      interval: 10s
       timeout: 5s
-      retries: 15
-    restart: on-failure
+      retries: 3
+    restart: unless-stopped
 
   pg_aee_test:
     container_name: pg_aee_test
@@ -50,10 +50,10 @@ services:
         "-U",
         "${DB_USER}",
       ]
-      interval: 3s
+      interval: 10s
       timeout: 5s
-      retries: 15
-    restart: on-failure
+      retries: 3
+    restart: unless-stopped
 
 networks:
   network:
