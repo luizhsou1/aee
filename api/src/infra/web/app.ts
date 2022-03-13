@@ -3,6 +3,7 @@ import express, { Express } from 'express'
 import path from 'path'
 
 import { Logger } from '../../shared/logger'
+import { getAllowSwagger } from '../../shared/utils'
 import errorHandler from './error-handler'
 import requestLogger from './request-logger'
 import routes from './routes'
@@ -17,7 +18,11 @@ export function setupApp (): Express {
   app.use('/images', express.static(path.join(__dirname, '..', '..', '..', 'public', 'images')))
 
   requestLogger.setup(app)
-  swagger.setup(app)
+
+  if (getAllowSwagger()) {
+    swagger.setup(app)
+  }
+
   routes.setup(app)
 
   errorHandler.setup(app)

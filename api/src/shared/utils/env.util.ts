@@ -27,6 +27,8 @@ export const getPort = (): number => Number(process.env.PORT) || 4000
 
 export const getServerBaseUrl = (): string => process.env.SERVER_BASE_URL || 'http://localhost:4000'
 
+export const getAllowSwagger = (): boolean => process.env.ALLOW_SWAGGER === 'true'
+
 // Test config
 
 export const getDbPortTest = (): number => Number(process.env.DB_PORT_TEST) || 5401
