@@ -18,9 +18,9 @@ services:
         "-U",
         "postgres",
       ]
-      interval: 3s
+      interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 3
     restart: on-failure
   
   aee_api:
@@ -40,9 +40,9 @@ services:
       - network
     healthcheck:
       test: curl --fail http://localhost:4000/health-check || exit 1
-      interval: 3s
+      interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 3
     restart: always
 
   aee_app:

@@ -17,7 +17,7 @@ function setup (app: Application) {
     level: 'info',
     msg: '[HTTP] {{res.statusCode}} {{req.method}} {{req.url}} {{res.responseTime}}ms',
     ignoreRoute: function (req: Request, res: Response) {
-      const blockListRegex = /^\/docs\/.*/
+      const blockListRegex = /^\/(docs|health-check).*/
       return blockListRegex.test(req.url)
     }
   }))

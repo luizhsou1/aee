@@ -24,9 +24,9 @@ services:
         "-U",
         "${DB_USER}",
       ]
-      interval: 3s
+      interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 3
     restart: on-failure
 
   pg_aee_test:
@@ -50,9 +50,9 @@ services:
         "-U",
         "${DB_USER}",
       ]
-      interval: 3s
+      interval: 10s
       timeout: 5s
-      retries: 15
+      retries: 3
     restart: on-failure
 
 networks:
