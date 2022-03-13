@@ -15,7 +15,7 @@ const swaggerOpts: swaggerJSDoc.Options = {
       title: TITLE,
       version: 'version'
     },
-    servers: [{ url: getServerBaseUrl() }],
+    servers: [{ url: getServerBaseUrl() }, { url: 'api.projetoaee.com.br' }],
     components: {
       securitySchemes: {
         bearerAuth: {
