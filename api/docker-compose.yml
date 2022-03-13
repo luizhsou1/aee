@@ -27,7 +27,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    restart: on-failure
+    restart: unless-stopped
 
   pg_aee_test:
     container_name: pg_aee_test
@@ -53,7 +53,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    restart: on-failure
+    restart: unless-stopped
 
 networks:
   network:
