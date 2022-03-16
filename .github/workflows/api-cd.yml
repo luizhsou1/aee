@@ -37,7 +37,7 @@ jobs:
           tags: luizhsou1/aee-api:latest
 
   deploy:
-    name: 'Build Image'
+    name: 'Deploy'
     runs-on: ubuntu-latest
     needs: build-image
     defaults:
