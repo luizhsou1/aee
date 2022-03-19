@@ -55,7 +55,7 @@ jobs:
       - name: Update App by SSH command
         uses: easingthemes/ssh-deploy@main
         env:
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY_EC2_PRD }}
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_APP_KEY_EC2_PRD }}
             ARGS: "-rltgoDzvO --delete"
             SOURCE: "dist/"
             REMOTE_HOST: ${{ secrets.SSH_HOST_EC2_PRD }}
