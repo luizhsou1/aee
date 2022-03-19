@@ -59,7 +59,7 @@ jobs:
         env:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_APP_KEY_EC2_PRD }}
             ARGS: "-rltgoDzvO --delete"
-            SOURCE: "dist/"
+            SOURCE: "app/dist/"
             REMOTE_HOST: ${{ secrets.SSH_HOST_EC2_PRD }}
             REMOTE_USER: ${{ secrets.SSH_USERNAME_EC2_PRD }}
             TARGET: ${{ secrets.SSH_APP_FOLDER_EC2_PRD }}
