@@ -50,8 +50,10 @@ jobs:
           node-version: '14.19.x'
       - run: npm ci
       - run: npm run build
-      - run: ls
-      - run: ls dist
+      - run: ls /home
+      - run: ls /home/runner
+      - run: ls /home/runner/work
+      - run: ls /home/runner/work/aee
       - name: Update App by SSH command
         uses: easingthemes/ssh-deploy@main
         env:
