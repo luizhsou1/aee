@@ -54,7 +54,7 @@ jobs:
       - run: ls /home/runner
       - run: ls /home/runner/work
       - run: ls /home/runner/work/aee
-      - name: Update App by SSH command
+      - name: Upload App files by SSH command
         uses: easingthemes/ssh-deploy@main
         env:
             SSH_PRIVATE_KEY: ${{ secrets.SSH_APP_KEY_EC2_PRD }}
@@ -63,6 +63,14 @@ jobs:
             REMOTE_HOST: ${{ secrets.SSH_HOST_EC2_PRD }}
             REMOTE_USER: ${{ secrets.SSH_USERNAME_EC2_PRD }}
             TARGET: ${{ secrets.SSH_APP_FOLDER_EC2_PRD }}
+      - name: Update APP by SSH command
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST_EC2_PRD }}
+          username: ${{ secrets.SSH_USERNAME_EC2_PRD }}
+          key: ${{ secrets.SSH_KEY_EC2_PRD }}
+          port: ${{ secrets.SSH_PORT_EC2_PRD }}
+          script: docker-compose up -d --force-recreate aee_api
 
 
     
